@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Code2, Heart, Shield, Terminal } from "lucide-react";
+import { Heart, Shield, Terminal } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   return (
@@ -8,13 +9,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                <Code2 className="h-4 w-4" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-white">
-                PSG<span className="text-indigo-500">Compile</span>
-              </span>
+            <Link href="/" className="inline-block group">
+              <Logo size={32} showText={true} />
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed">
               Institution-wide competitive programming and online judge platform unifying coders across all PSG colleges, schools, and departments.

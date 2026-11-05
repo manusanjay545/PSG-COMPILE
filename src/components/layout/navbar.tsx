@@ -32,6 +32,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { SearchDialog } from "@/components/search-dialog";
+import { Logo } from "@/components/ui/logo";
 import { MOCK_CURRENT_USER } from "@/lib/data/mock-data";
 
 export function Navbar() {
@@ -66,17 +67,7 @@ export function Navbar() {
           {/* Brand Logo */}
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                <Code2 className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors">
-                  PSG<span className="text-indigo-500">Compile</span>
-                </span>
-                <span className="hidden sm:block text-[10px] uppercase tracking-wider text-zinc-400 font-medium">
-                  One PSG · One Community
-                </span>
-              </div>
+              <Logo size={36} showText={true} />
             </Link>
 
             {/* Desktop Navigation Links */}

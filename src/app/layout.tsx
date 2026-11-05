@@ -32,6 +32,13 @@ export const metadata: Metadata = {
     "PSG iTech",
     "PSG IM",
   ],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/icon-512.png",
+  },
 };
 
 export default function RootLayout({

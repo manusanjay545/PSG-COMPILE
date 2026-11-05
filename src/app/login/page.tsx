@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Code2, ArrowLeft, Shield, Sparkles } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,16 +72,16 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md space-y-6 relative z-10">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-xl shadow-indigo-600/20 mb-2">
-            <Code2 className="h-6 w-6 text-white" />
+        <div className="text-center space-y-3 flex flex-col items-center">
+          <Logo size={56} />
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              Welcome to PSG<span className="text-indigo-500">Compile</span>
+            </h1>
+            <p className="text-xs text-zinc-400 mt-1">
+              One PSG · One Coding Community
+            </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Welcome to PSG<span className="text-indigo-500">Compile</span>
-          </h1>
-          <p className="text-xs text-zinc-400">
-            One PSG · One Coding Community
-          </p>
         </div>
 
         {/* Card */}
