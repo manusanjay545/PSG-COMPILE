@@ -63,6 +63,7 @@ html.light [class~="bg-zinc-950/80"] { background-color: rgb(255 255 255 / 0.92)
 html.light [class~="bg-zinc-900"],
 html.light [class~="bg-zinc-900/60"],
 html.light [class~="bg-zinc-900/70"],
+html.light [class~="bg-zinc-900/40"],
 html.light [class~="bg-zinc-900/90"] { background-color: var(--surface) !important; }
 html.light [class~="bg-zinc-800"],
 html.light [class~="bg-zinc-800/80"] { background-color: var(--surface-raised) !important; }
@@ -145,4 +146,3 @@ html.light input,
 html.light textarea,
 html.light select { color-scheme: light; }
 html.light ::selection { background: #dbe4ff; color: #1e1b4b; }
-
