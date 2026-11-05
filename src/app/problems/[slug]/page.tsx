@@ -45,6 +45,7 @@ import {
   MOCK_CURRENT_USER,
 } from "@/lib/data/mock-data";
 import { ExecutionResponse, TestCaseResult } from "@/lib/judge/executor";
+import { InlineProblemAd } from "@/components/compiler/compiler-ad";
 import type { Problem } from "@/types";
 
 // Dynamically import Monaco Editor to prevent SSR window issues
@@ -315,6 +316,8 @@ function ProblemDetailPageContent() {
                 <p className="whitespace-pre-line text-sm">{problem.description}</p>
               </div>
 
+              <InlineProblemAd />
+
               {problem.diagram && (
                 <section className="space-y-2">
                   <h3 className="text-xs uppercase font-bold tracking-wider text-zinc-400">Diagram</h3>
@@ -397,6 +400,8 @@ function ProblemDetailPageContent() {
                   </div>
                 </div>
               )}
+
+              <InlineProblemAd />
             </TabsContent>
 
             {/* TAB 2: Editorial */}
@@ -731,3 +736,4 @@ export default function ProblemDetailPage() {
     </React.Suspense>
   );
 }
+

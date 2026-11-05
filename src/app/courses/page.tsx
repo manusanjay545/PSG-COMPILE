@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { COURSES } from "@/lib/courses/catalog";
+import { CourseSideAd } from "@/components/compiler/compiler-ad";
 
 export default function CoursesPage() {
   const [completed, setCompleted] = React.useState<Record<string, number>>({});
@@ -28,7 +29,10 @@ export default function CoursesPage() {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
       <Navbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[160px_minmax(0,1fr)_160px]">
+          <CourseSideAd />
+          <div className="min-w-0 space-y-8">
         <header className="relative overflow-hidden rounded-3xl border border-indigo-400/15 bg-gradient-to-br from-indigo-500/15 via-zinc-900 to-zinc-950 p-6 sm:p-9">
           <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
           <div className="relative max-w-3xl space-y-4">
@@ -59,8 +63,12 @@ export default function CoursesPage() {
         </section>
 
         <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.05] p-5 sm:flex-row sm:items-center"><div><p className="flex items-center gap-2 font-semibold text-white"><Sparkles className="h-4 w-4 text-emerald-300" />Your achievements</p><p className="mt-1 text-sm text-zinc-400">Certificates are issued to your account after you pass every chapter and are saved with your profile details.</p></div><Link href="/settings" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 hover:text-emerald-100"><CheckCircle2 className="h-4 w-4" />View profile certificates</Link></div>
+          </div>
+          <CourseSideAd />
+        </div>
       </main>
       <Footer />
     </div>
   );
 }
+

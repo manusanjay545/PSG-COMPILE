@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingIndicator } from "@/components/ui/loading-state";
+import { ProblemListAd } from "@/components/compiler/compiler-ad";
 
 type ArchiveProblem = {
   id: string;
@@ -87,7 +88,10 @@ export default function ProblemsPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
       <Navbar />
-      <main className="flex-1 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6 w-full">
+      <main className="flex-1 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[160px_minmax(0,1fr)]">
+          <ProblemListAd />
+          <div className="space-y-6 min-w-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-6">
           <div className="space-y-1">
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Coding problems for practice</h1>
@@ -190,8 +194,11 @@ export default function ProblemsPage() {
             Next <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
+          </div>
+        </div>
       </main>
       <Footer />
     </div>
   );
 }
+
