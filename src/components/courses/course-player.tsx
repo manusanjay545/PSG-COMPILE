@@ -142,7 +142,7 @@ export function CoursePlayer({ slug }: { slug: string }) {
       }
       setCompleted(data.completedChapters ?? [...completed, chapter]);
       if (data.certificate) { setCertificate(data.certificate); setShowCertificate(true); }
-      else { setNotice("Chapter passed! The next chapter is now unlocked."); setAssessment(null); setAnswers([]); setRevealedAnswers({}); setCodeSolution(null); setChapter((value) => Math.min(value + 1, course.modules.length - 1)); }
+      else { setNotice("Chapter passed! The next chapter is now unlocked."); setAssessment(null); setAnswers([]); setRevealedAnswers({}); setCodeSolution(null); setChapter((value) => Math.min(value + 1, course.modules.length - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }
     } catch (submitError) { setError(submitError instanceof Error ? submitError.message : "Could not submit your chapter test."); }
     finally { setSubmitting(false); }
   };

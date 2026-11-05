@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AvatarPicker } from "@/components/profile/avatar-picker";
 import { DEFAULT_AVATARS, type AvatarSource } from "@/lib/profile/avatars";
+import { CURRENT_CALENDAR_YEAR, getAcademicStanding } from "@/lib/profile/academic";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthPageProps = { mode: "login" | "signup" };
@@ -23,6 +24,8 @@ export function AuthPage({ mode }: AuthPageProps) {
   const [error, setError] = React.useState("");
   const [avatarUrl, setAvatarUrl] = React.useState(DEFAULT_AVATARS[0]);
   const [avatarSource, setAvatarSource] = React.useState<AvatarSource>("preset");
+  const [batchStartYear, setBatchStartYear] = React.useState("");
+  const [batchEndYear, setBatchEndYear] = React.useState("");
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -53,13 +56,19 @@ export function AuthPage({ mode }: AuthPageProps) {
       const supabase = createClient();
       if (isSignup) {
         if (password.length < 8) throw new Error("Use a password with at least 8 characters.");
+        const startYear = Number(formData.get("batch_start_year"));
+        const endYear = Number(formData.get("batch_end_year"));
+        const academicYear = getAcademicStanding(startYear, endYear);
+        if (academicYear.startsWith("Enter a valid")) throw new Error(academicYear);
         const profile = {
           full_name: String(formData.get("full_name") || "").trim(),
           roll_number: String(formData.get("roll_number") || "").trim(),
           college_name: String(formData.get("college_name") || "").trim(),
           department_name: String(formData.get("department_name") || "").trim(),
-          academic_year: String(formData.get("academic_year") || "").trim(),
-          class_name: String(formData.get("class_name") || "").trim(),
+          batch_start_year: startYear,
+          batch_end_year: endYear,
+          graduation_year: endYear,
+          academic_year: academicYear,
           bio: String(formData.get("bio") || "").trim(),
           avatar_url: avatarUrl,
           avatar_source: avatarSource,
@@ -144,9 +153,10 @@ export function AuthPage({ mode }: AuthPageProps) {
                     <Field id="roll_number" label="Roll number"><Input id="roll_number" name="roll_number" required maxLength={40} placeholder="e.g. 23IT042" className="border-zinc-800 bg-zinc-950" /></Field>
                     <Field id="college_name" label="College name"><Input id="college_name" name="college_name" required maxLength={120} placeholder="Your college" className="border-zinc-800 bg-zinc-950" /></Field>
                     <Field id="department_name" label="Department"><Input id="department_name" name="department_name" required maxLength={120} placeholder="e.g. Information Technology" className="border-zinc-800 bg-zinc-950" /></Field>
-                    <Field id="academic_year" label="Year"><Input id="academic_year" name="academic_year" required maxLength={40} placeholder="e.g. 2nd year" className="border-zinc-800 bg-zinc-950" /></Field>
-                    <Field id="class_name" label="Class"><Input id="class_name" name="class_name" required maxLength={60} placeholder="e.g. IT-A" className="border-zinc-800 bg-zinc-950" /></Field>
+                    <Field id="batch_start_year" label="Batch start year"><Input id="batch_start_year" name="batch_start_year" type="number" required min={2000} max={CURRENT_CALENDAR_YEAR + 10} value={batchStartYear} onChange={(event) => setBatchStartYear(event.target.value)} placeholder="e.g. 2024" className="border-zinc-800 bg-zinc-950" /></Field>
+                    <Field id="batch_end_year" label="Batch end year"><Input id="batch_end_year" name="batch_end_year" type="number" required min={2000} max={CURRENT_CALENDAR_YEAR + 10} value={batchEndYear} onChange={(event) => setBatchEndYear(event.target.value)} placeholder="e.g. 2027" className="border-zinc-800 bg-zinc-950" /></Field>
                   </div>
+                  <p className="-mt-2 text-xs text-indigo-200" aria-live="polite">{batchStartYear && batchEndYear ? getAcademicStanding(Number(batchStartYear), Number(batchEndYear)) : "Enter your batch start and end years; we’ll calculate your current year or passed-out status."}</p>
                   <Field id="bio" label="Bio (optional)"><textarea id="bio" name="bio" maxLength={280} rows={3} placeholder="A little about you" className="flex w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500" /></Field>
                   <div className="space-y-2">
                     <Label className="text-xs text-zinc-300">Choose a profile avatar</Label>

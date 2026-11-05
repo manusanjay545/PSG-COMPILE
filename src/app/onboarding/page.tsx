@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_AVATARS, type AvatarSource } from "@/lib/profile/avatars";
+import { CURRENT_CALENDAR_YEAR, getAcademicStanding } from "@/lib/profile/academic";
 import { createClient } from "@/lib/supabase/client";
 
 type ProfileFields = {
@@ -18,15 +19,16 @@ type ProfileFields = {
   roll_number: string;
   college_name: string;
   department_name: string;
+  batch_start_year: string;
+  batch_end_year: string;
   academic_year: string;
-  class_name: string;
   bio: string;
   avatar_url: string;
   avatar_source: AvatarSource;
 };
 
 const emptyProfile: ProfileFields = {
-  full_name: "", roll_number: "", college_name: "", department_name: "", academic_year: "", class_name: "", bio: "", avatar_url: DEFAULT_AVATARS[0], avatar_source: "preset",
+  full_name: "", roll_number: "", college_name: "", department_name: "", batch_start_year: "", batch_end_year: "", academic_year: "", bio: "", avatar_url: DEFAULT_AVATARS[0], avatar_source: "preset",
 };
 
 export default function OnboardingPage() {
@@ -49,7 +51,7 @@ export default function OnboardingPage() {
         }
         const { data, error: profileError } = await supabase
           .from("profiles")
-          .select("full_name, roll_number, college_name, department_name, academic_year, class_name, bio, avatar_url, avatar_source")
+          .select("full_name, roll_number, college_name, department_name, batch_start_year, batch_end_year, academic_year, bio, avatar_url, avatar_source")
           .eq("id", user.id)
           .maybeSingle();
         if (profileError) throw profileError;
@@ -58,6 +60,8 @@ export default function OnboardingPage() {
         setProfile({
           ...emptyProfile,
           ...(data || {}),
+          batch_start_year: data?.batch_start_year ? String(data.batch_start_year) : "",
+          batch_end_year: data?.batch_end_year ? String(data.batch_end_year) : "",
           full_name: data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",
           avatar_url: data?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || DEFAULT_AVATARS[0],
           avatar_source: data?.avatar_source || (user.user_metadata?.picture || user.user_metadata?.avatar_url ? "google" : "preset"),
@@ -79,6 +83,10 @@ export default function OnboardingPage() {
     setSaving(true);
     setError("");
     try {
+      const startYear = Number(profile.batch_start_year);
+      const endYear = Number(profile.batch_end_year);
+      const academicYear = getAcademicStanding(startYear, endYear);
+      if (academicYear.startsWith("Enter a valid")) throw new Error(academicYear);
       const supabase = createClient();
       const { error: saveError } = await supabase.from("profiles").upsert({
         id: userId,
@@ -86,8 +94,10 @@ export default function OnboardingPage() {
         roll_number: profile.roll_number.trim(),
         college_name: profile.college_name.trim(),
         department_name: profile.department_name.trim(),
-        academic_year: profile.academic_year.trim(),
-        class_name: profile.class_name.trim(),
+        batch_start_year: startYear,
+        batch_end_year: endYear,
+        graduation_year: endYear,
+        academic_year: academicYear,
         bio: profile.bio.trim() || null,
         avatar_url: profile.avatar_url,
         avatar_source: profile.avatar_source,
@@ -108,7 +118,7 @@ export default function OnboardingPage() {
         <div className="space-y-2 text-center">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/20 bg-indigo-600/10 px-3 py-1 text-xs font-semibold text-indigo-300"><CheckCircle2 className="h-3.5 w-3.5" />Student profile</div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white">Complete your PSG profile</h1>
-          <p className="mx-auto max-w-lg text-sm text-zinc-400">Add your college and class details so your profile is ready for the community.</p>
+          <p className="mx-auto max-w-lg text-sm text-zinc-400">Add your college and batch years so your profile can show your current year or passed-out status.</p>
         </div>
 
         <Card className="border-zinc-800 bg-zinc-900/90 shadow-2xl">
@@ -125,9 +135,10 @@ export default function OnboardingPage() {
                   <Field id="roll_number" label="Roll number"><Input id="roll_number" required maxLength={40} value={profile.roll_number} onChange={(event) => setField("roll_number", event.target.value)} placeholder="e.g. 23IT042" className="border-zinc-800 bg-zinc-950" /></Field>
                   <Field id="college_name" label="College name"><Input id="college_name" required maxLength={120} value={profile.college_name} onChange={(event) => setField("college_name", event.target.value)} className="border-zinc-800 bg-zinc-950" /></Field>
                   <Field id="department_name" label="Department"><Input id="department_name" required maxLength={120} value={profile.department_name} onChange={(event) => setField("department_name", event.target.value)} className="border-zinc-800 bg-zinc-950" /></Field>
-                  <Field id="academic_year" label="Year"><Input id="academic_year" required maxLength={40} value={profile.academic_year} onChange={(event) => setField("academic_year", event.target.value)} placeholder="e.g. 2nd year" className="border-zinc-800 bg-zinc-950" /></Field>
-                  <Field id="class_name" label="Class"><Input id="class_name" required maxLength={60} value={profile.class_name} onChange={(event) => setField("class_name", event.target.value)} placeholder="e.g. IT-A" className="border-zinc-800 bg-zinc-950" /></Field>
+                  <Field id="batch_start_year" label="Batch start year"><Input id="batch_start_year" type="number" min={2000} max={CURRENT_CALENDAR_YEAR + 10} required value={profile.batch_start_year} onChange={(event) => setField("batch_start_year", event.target.value)} placeholder="e.g. 2024" className="border-zinc-800 bg-zinc-950" /></Field>
+                  <Field id="batch_end_year" label="Batch end year"><Input id="batch_end_year" type="number" min={2000} max={CURRENT_CALENDAR_YEAR + 10} required value={profile.batch_end_year} onChange={(event) => setField("batch_end_year", event.target.value)} placeholder="e.g. 2027" className="border-zinc-800 bg-zinc-950" /></Field>
                 </div>
+                <p className="text-xs text-indigo-200" aria-live="polite">{profile.batch_start_year && profile.batch_end_year ? getAcademicStanding(Number(profile.batch_start_year), Number(profile.batch_end_year)) : "Your current year or passed-out status will be calculated from this batch."}</p>
                 <Field id="bio" label="Bio (optional)"><Textarea id="bio" rows={3} maxLength={280} value={profile.bio} onChange={(event) => setField("bio", event.target.value)} className="border-zinc-800 bg-zinc-950" placeholder="A little about you" /></Field>
               </>}
               {error && <p role="alert" className="rounded-md border border-red-900 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}

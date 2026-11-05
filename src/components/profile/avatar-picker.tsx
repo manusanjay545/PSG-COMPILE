@@ -7,6 +7,42 @@ import { Button } from "@/components/ui/button";
 import { DEFAULT_AVATARS, type AvatarSource } from "@/lib/profile/avatars";
 import { createClient } from "@/lib/supabase/client";
 
+async function compressAvatar(file: File) {
+  let image: CanvasImageSource;
+  let width: number;
+  let height: number;
+  let closeImage: () => void = () => {};
+  if (typeof createImageBitmap === "function") {
+    const bitmap = await createImageBitmap(file);
+    image = bitmap;
+    width = bitmap.width;
+    height = bitmap.height;
+    closeImage = () => bitmap.close();
+  } else {
+    const objectUrl = URL.createObjectURL(file);
+    const fallback = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not read this photo."));
+      img.src = objectUrl;
+    }).finally(() => URL.revokeObjectURL(objectUrl));
+    image = fallback;
+    width = fallback.naturalWidth;
+    height = fallback.naturalHeight;
+  }
+  const edge = 320;
+  const scale = Math.min(1, edge / Math.max(width, height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const context = canvas.getContext("2d");
+  if (!context) { closeImage(); throw new Error("Could not prepare this photo."); }
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+  closeImage();
+  const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((image) => image ? resolve(image) : reject(new Error("Could not compress this photo.")), "image/webp", 0.78));
+  return new File([blob], "avatar.webp", { type: "image/webp", lastModified: Date.now() });
+}
+
 type AvatarPickerProps = {
   value: string;
   source?: AvatarSource;
@@ -33,22 +69,24 @@ export function AvatarPicker({ value, source, userId, allowUpload = false, onCha
       setError("Choose a JPG, PNG, or WebP image.");
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setError("Choose an image smaller than 2 MB.");
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Choose an image smaller than 8 MB.");
       return;
     }
 
     setUploading(true);
     try {
       const supabase = createClient();
-      const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-      const path = `${userId}/avatar.${extension}`;
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, {
+      const compressed = await compressAvatar(file);
+      if (compressed.size > 250 * 1024) throw new Error("This photo could not be compressed enough. Choose a smaller image.");
+      const path = `${userId}/avatar.webp`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, compressed, {
         cacheControl: "3600",
-        contentType: file.type,
+        contentType: "image/webp",
         upsert: true,
       });
       if (uploadError) throw uploadError;
+      await supabase.storage.from("avatars").remove([`${userId}/avatar.jpg`, `${userId}/avatar.jpeg`, `${userId}/avatar.png`]);
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       onChange(`${data.publicUrl}?v=${Date.now()}`, "upload");
     } catch (uploadError) {

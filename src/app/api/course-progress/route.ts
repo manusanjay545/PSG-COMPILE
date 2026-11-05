@@ -3,6 +3,7 @@ import { getCourseAssessment } from "@/lib/courses/assessments";
 import { COURSES } from "@/lib/courses/catalog";
 import { runTestCases } from "@/lib/judge/run-code";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { getAcademicStanding } from "@/lib/profile/academic";
 
 export const maxDuration = 45;
 
@@ -60,12 +61,13 @@ export async function POST(request: NextRequest) {
     if (completed.size === course.modules.length) {
       certificate = await findCertificate(db, user.id, courseSlug);
       if (!certificate) {
-        const { data: profile } = await db.from("profiles").select("full_name,roll_number,college_name,department_name,academic_year").eq("id", user.id).maybeSingle();
+        const { data: profile } = await db.from("profiles").select("full_name,roll_number,college_name,department_name,academic_year,batch_start_year,batch_end_year").eq("id", user.id).maybeSingle();
         const learnerName = profile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "PSGCompile Learner";
+        const academicYear = profile?.batch_start_year && profile?.batch_end_year ? getAcademicStanding(profile.batch_start_year, profile.batch_end_year) : profile?.academic_year ?? null;
         const { data: issued, error: issueError } = await db.from("course_certificates").insert({
           user_id: user.id, course_slug: course.slug, course_title: course.title, learner_name: learnerName,
           roll_number: profile?.roll_number ?? null, college_name: profile?.college_name ?? null,
-          department_name: profile?.department_name ?? null, academic_year: profile?.academic_year ?? null,
+          department_name: profile?.department_name ?? null, academic_year: academicYear,
         }).select("course_slug,course_title,certificate_code,learner_name,roll_number,college_name,department_name,academic_year,issued_at").single();
         if (issueError) return NextResponse.json({ error: "Course completed, but certificate issuance failed. Contact support with your profile." }, { status: 500 });
         certificate = issued;

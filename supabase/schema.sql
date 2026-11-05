@@ -113,7 +113,8 @@ CREATE TABLE profiles (
   college_name TEXT,
   department_name TEXT,
   academic_year TEXT,
-  class_name TEXT,
+  batch_start_year INT,
+  batch_end_year INT,
   institution_id UUID REFERENCES institutions(id),
   department_id UUID REFERENCES departments(id),
   program_id UUID REFERENCES programs(id),
@@ -121,6 +122,7 @@ CREATE TABLE profiles (
   section_id UUID REFERENCES sections(id),
   roll_number TEXT,
   graduation_year INT,
+  CONSTRAINT profiles_batch_years_ordered CHECK (batch_start_year IS NULL OR batch_end_year IS NULL OR batch_end_year >= batch_start_year),
   -- Stats (denormalized for performance)
   problems_solved INT DEFAULT 0,
   easy_solved INT DEFAULT 0,
@@ -917,7 +919,9 @@ BEGIN
     college_name,
     department_name,
     academic_year,
-    class_name,
+    batch_start_year,
+    batch_end_year,
+    graduation_year,
     institution_id,
     rating,
     peak_rating,
@@ -934,7 +938,18 @@ BEGIN
     NULLIF(BTRIM(NEW.raw_user_meta_data->>'college_name'), ''),
     NULLIF(BTRIM(NEW.raw_user_meta_data->>'department_name'), ''),
     NULLIF(BTRIM(NEW.raw_user_meta_data->>'academic_year'), ''),
-    NULLIF(BTRIM(NEW.raw_user_meta_data->>'class_name'), ''),
+    CASE WHEN NEW.raw_user_meta_data->>'batch_start_year' ~ '^[0-9]{4}$'
+      AND NEW.raw_user_meta_data->>'batch_end_year' ~ '^[0-9]{4}$'
+      AND (NEW.raw_user_meta_data->>'batch_end_year')::INT >= (NEW.raw_user_meta_data->>'batch_start_year')::INT
+      THEN (NEW.raw_user_meta_data->>'batch_start_year')::INT END,
+    CASE WHEN NEW.raw_user_meta_data->>'batch_start_year' ~ '^[0-9]{4}$'
+      AND NEW.raw_user_meta_data->>'batch_end_year' ~ '^[0-9]{4}$'
+      AND (NEW.raw_user_meta_data->>'batch_end_year')::INT >= (NEW.raw_user_meta_data->>'batch_start_year')::INT
+      THEN (NEW.raw_user_meta_data->>'batch_end_year')::INT END,
+    CASE WHEN NEW.raw_user_meta_data->>'batch_start_year' ~ '^[0-9]{4}$'
+      AND NEW.raw_user_meta_data->>'batch_end_year' ~ '^[0-9]{4}$'
+      AND (NEW.raw_user_meta_data->>'batch_end_year')::INT >= (NEW.raw_user_meta_data->>'batch_start_year')::INT
+      THEN (NEW.raw_user_meta_data->>'batch_end_year')::INT END,
     v_institution_id,
     1200,
     1200,
@@ -944,8 +959,8 @@ BEGIN
         AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'roll_number'), '') IS NOT NULL
         AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'college_name'), '') IS NOT NULL
         AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'department_name'), '') IS NOT NULL
-        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'academic_year'), '') IS NOT NULL
-        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'class_name'), '') IS NOT NULL
+        AND NEW.raw_user_meta_data->>'batch_start_year' ~ '^[0-9]{4}$'
+        AND NEW.raw_user_meta_data->>'batch_end_year' ~ '^[0-9]{4}$'
       THEN true ELSE false
     END
   )

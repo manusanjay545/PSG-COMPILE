@@ -97,8 +97,9 @@ export interface Profile {
   bio: string | null;
   college_name: string | null;
   department_name: string | null;
+  batch_start_year: number | null;
+  batch_end_year: number | null;
   academic_year: string | null;
-  class_name: string | null;
   institution_id: string | null;
   department_id: string | null;
   program_id: string | null;
