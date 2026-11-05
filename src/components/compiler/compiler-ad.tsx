@@ -42,7 +42,7 @@ export function CompilerBannerAd() {
       height={90}
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
-      sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
       className="block max-w-full rounded-lg border border-white/[0.07] bg-[#101216]"
     />
   </aside>;
