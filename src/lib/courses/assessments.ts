@@ -12,16 +12,17 @@ const distractors = [
   "Put all logic in one block so it is harder to test separately.",
 ];
 
-function makeQuestions(module: CourseModule): CourseQuestion[] {
-  const otherTopics = module.topics.slice(1).concat(["Deployment and version control", "Graphic design fundamentals", "Network cabling"]);
+function makeQuestions(module: CourseModule, courseModules: CourseModule[]): CourseQuestion[] {
+  const otherModules = courseModules.filter((item) => item !== module);
+  const otherLessonIdeas = otherModules.map((item) => item.lesson.split(/[.!?]/)[0].trim().slice(0, 150));
   const keyIdea = module.lesson.split(/[.!?]/)[0].trim().slice(0, 150);
-  const challenges = [module.exercise, "Build a responsive color palette picker.", "Write a program that draws a maze using text characters."].map((text) => text.slice(0, 160));
+  const challenges = [module.exercise, ...otherModules.map((item) => item.exercise)].map((text) => text.slice(0, 160));
   const questions: CourseQuestion[] = [
-    { question: `Which concept is directly covered in “${module.title}”?`, options: [module.topics[0], ...otherTopics.slice(0, 3)], answer: 0 },
-    { question: "Which statement best matches the chapter's core guidance?", options: [keyIdea, ...distractors.slice(0, 3)], answer: 0 },
+    { question: `Which topic is introduced first in the “${module.title}” learning sequence?`, options: [module.topics[0], ...module.topics.slice(1, 4)], answer: 0 },
+    { question: "Which statement best matches this chapter's core guidance?", options: [keyIdea, ...otherLessonIdeas.slice(0, 3)], answer: 0 },
     { question: "After reading the example, what is the best next learning step?", options: ["Trace it with a small input, then change one thing and predict the result.", ...distractors.slice(1)], answer: 0 },
     { question: "Which test set gives the strongest first check for your solution?", options: ["A normal case, a boundary case, and an invalid or empty case.", "Only the exact example shown in the lesson.", "One very large random case with no expected answer.", "No tests if the code compiles."], answer: 0 },
-    { question: "What practical task is assigned in this chapter?", options: [challenges[0], ...challenges.slice(1)], answer: 0 },
+    { question: "Which practical task is assigned in this chapter?", options: [challenges[0], ...challenges.slice(1, 4)], answer: 0 },
   ];
   return questions.map((item, index) => {
     const shift = (index + module.title.length) % item.options.length;
@@ -73,6 +74,6 @@ export function getCourseAssessment(courseSlug: string, chapterIndex: number) {
   const chapterModule = course?.modules[chapterIndex];
   if (!course || !chapterModule) return null;
   const codeIndex = chapterIndex % taskText.length;
-  const courseQuestions = makeQuestions(chapterModule);
+  const courseQuestions = makeQuestions(chapterModule, course.modules);
   return { course, module: chapterModule, questions: courseQuestions, codingTest: codingTest(course.language, codeIndex) };
 }
