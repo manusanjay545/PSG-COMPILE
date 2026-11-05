@@ -28,7 +28,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { SearchDialog } from "@/components/search-dialog";
 import { Logo } from "@/components/ui/logo";
 import { createClient } from "@/lib/supabase/client";
@@ -49,6 +48,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [account, setAccount] = React.useState<NavbarAccount | null>(null);
+  const [recentBadges, setRecentBadges] = React.useState<Array<{ id: string; name: string; icon: string; description: string; award: { awarded_at: string } | null }>>([]);
 
   React.useEffect(() => {
     let active = true;
@@ -75,6 +75,16 @@ export function Navbar() {
     void loadAccount();
     return () => { active = false; };
   }, []);
+
+  React.useEffect(() => {
+    if (!account) return;
+    let active = true;
+    fetch("/api/achievements", { cache: "no-store" }).then((response) => response.ok ? response.json() : null)
+      .then((result) => {
+        if (active && result?.badges) setRecentBadges(result.badges.filter((badge: { earned: boolean }) => badge.earned).slice(0, 3));
+      }).catch(() => undefined);
+    return () => { active = false; };
+  }, [account]);
 
   const signOut = async () => {
     try {
@@ -197,29 +207,13 @@ export function Navbar() {
               <DropdownMenuContent align="end" className="w-80 bg-zinc-900 border-zinc-800">
                 <DropdownMenuLabel className="flex items-center justify-between font-normal text-xs text-zinc-400">
                   <span>Notifications</span>
-                  <Badge variant="outline" className="text-[10px] border-indigo-500/40 text-indigo-400">
-                    2 New
-                  </Badge>
+                  <span className="text-[10px] text-zinc-500">{recentBadges.length} earned</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-zinc-800" />
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2 cursor-pointer focus:bg-zinc-800">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
-                    <Trophy className="h-3.5 w-3.5 text-amber-400" />
-                    <span>PSG Coding Championship 2026 is LIVE!</span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400">
-                    Round 1 is in progress. Solve 4 problems now.
-                  </p>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 py-2 cursor-pointer focus:bg-zinc-800">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200">
-                    <Award className="h-3.5 w-3.5 text-indigo-400" />
-                    <span>Badge Unlocked: 30 Day Streak</span>
-                  </div>
-                  <p className="text-[11px] text-zinc-400">
-                    You have maintained continuous activity for 30 days!
-                  </p>
-                </DropdownMenuItem>
+                {recentBadges.length ? recentBadges.map((badge) => <DropdownMenuItem key={badge.id} className="flex flex-col items-start gap-1 py-2 focus:bg-zinc-800">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-200"><Award className="h-3.5 w-3.5 text-emerald-400" /><span>{badge.icon} {badge.name}</span></div>
+                  <p className="text-[11px] text-zinc-400">{badge.description}{badge.award ? ` · ${new Date(badge.award.awarded_at).toLocaleDateString()}` : ""}</p>
+                </DropdownMenuItem>) : <div className="px-2 py-3 text-xs text-zinc-500">No badges earned yet. Solve problems to earn them.</div>}
               </DropdownMenuContent>
             </DropdownMenu>
 

@@ -8,7 +8,6 @@ import {
   Language,
   Contest,
   LeaderboardEntry,
-  Badge,
   Profile,
   Discussion,
   Solution,
@@ -906,15 +905,6 @@ export const MOCK_CONTESTS: Contest[] = [
     created_at: "2026-03-01T10:00:00.000Z",
     updated_at: "2026-03-01T10:00:00.000Z",
   },
-];
-
-export const MOCK_BADGES: Badge[] = [
-  { id: "badge-1", name: "First Solve", slug: "first-solve", description: "Solved your first problem on PSGCompile", icon: "🏆", category: "problems", rule_type: "problems_solved", rule_value: 1, rule_config: {}, is_active: true, sort_order: 1, created_at: "" },
-  { id: "badge-2", name: "7 Day Streak", slug: "7-day-streak", description: "Maintained a continuous 7-day coding streak", icon: "🔥", category: "streak", rule_type: "streak", rule_value: 7, rule_config: {}, is_active: true, sort_order: 2, created_at: "" },
-  { id: "badge-3", name: "30 Day Streak", slug: "30-day-streak", description: "30 consecutive days of active code submissions", icon: "⚡", category: "streak", rule_type: "streak", rule_value: 30, rule_config: {}, is_active: true, sort_order: 3, created_at: "" },
-  { id: "badge-4", name: "100 Problems", slug: "100-problems", description: "Surpassed 100 solved problems", icon: "💯", category: "problems", rule_type: "problems_solved", rule_value: 100, rule_config: {}, is_active: true, sort_order: 4, created_at: "" },
-  { id: "badge-5", name: "PSG Topper", slug: "psg-topper", description: "Reached Top 3 on the PSG-wide leaderboard", icon: "👑", category: "special", rule_type: "custom", rule_value: null, rule_config: {}, is_active: true, sort_order: 5, created_at: "" },
-  { id: "badge-6", name: "Contest Winner", slug: "contest-winner", description: "Won 1st place in an official PSGCompile contest", icon: "🥇", category: "contests", rule_type: "custom", rule_value: null, rule_config: {}, is_active: true, sort_order: 6, created_at: "" },
 ];
 
 export const MOCK_CURRENT_USER: Profile = {
