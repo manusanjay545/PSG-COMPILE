@@ -44,7 +44,7 @@ type NavbarAccount = {
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [account, setAccount] = React.useState<NavbarAccount | null>(null);
@@ -160,15 +160,12 @@ export function Navbar() {
               variant="outline"
               size="sm"
               onClick={() => setSearchOpen(true)}
-              className="hidden lg:flex items-center gap-3 bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 px-3 w-56 justify-between"
+              className="hidden lg:flex h-9 w-52 xl:w-56 items-center justify-start gap-2 bg-zinc-900 border-zinc-800 px-3 text-left text-zinc-400 hover:text-zinc-200"
             >
               <div className="flex items-center gap-2">
                 <Search className="h-3.5 w-3.5" />
                 <span className="text-xs">Search problems, users...</span>
               </div>
-              <kbd className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-mono text-zinc-400 border border-zinc-700">
-                Ctrl K
-              </kbd>
             </Button>
 
             {/* Streak Pill */}
@@ -181,11 +178,11 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
               className="h-9 w-9 text-zinc-400 hover:text-zinc-100"
               aria-label="Toggle theme"
             >
-              {theme === "light" ? (
+              {resolvedTheme === "light" ? (
                 <Moon className="h-4 w-4" />
               ) : (
                 <Sun className="h-4 w-4" />
