@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, Command, Play, RotateCcw, Terminal, Trophy, Zap } from "lucide-react";
+import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, Play, RotateCcw, Terminal, Trophy, Zap } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,7 @@ function ActivityPanel({ activity, recent }: { activity: ActivityDay[]; recent: 
     while (active.has(localDateKey(cursor))) { streak += 1; cursor.setDate(cursor.getDate() - 1); }
     return streak;
   }, [activity]);
-  return <aside className="space-y-4">
+  return <aside className="grid gap-4 xl:grid-cols-3">
     <section className="rounded-2xl border border-white/[0.07] bg-[#101216] p-5 shadow-xl shadow-black/10">
       <div className="flex items-center justify-between">
         <div><p className="text-sm font-semibold text-zinc-100">Your activity</p><p className="mt-1 text-xs text-zinc-500">Runs saved on this device</p></div>
@@ -203,7 +203,7 @@ export function CompilerWorkspace() {
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500"><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Zap className="h-3.5 w-3.5 text-amber-300" />Fast isolated runtime</span><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Check className="h-3.5 w-3.5 text-emerald-300" />No setup needed</span></div>
       </div>
 
-      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.76fr)]">
         <section className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101216] shadow-2xl shadow-black/25">
           <div className="flex min-h-[58px] flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] bg-[#14161a] px-3 py-2.5 sm:px-4">
             <div className="flex min-w-0 items-center gap-2">
@@ -222,19 +222,27 @@ export function CompilerWorkspace() {
           </div>
           {languageError && <div role="alert" className="border-b border-amber-300/10 bg-amber-300/[0.04] px-4 py-2 text-xs text-amber-200">{languageError} Set a working JUDGE0_API_URL to enable the compiler.</div>}
           <div className="overflow-hidden bg-[#101216]">
-            <Editor height="min(54vh, 540px)" language={editorLanguage(selectedLanguage)} value={code} onChange={(value) => setCode(value || "")} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 14, lineHeight: 23, padding: { top: 18, bottom: 18 }, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: "on", automaticLayout: true, tabSize: 4, renderLineHighlight: "gutter", fontFamily: "'SF Mono', 'Cascadia Code', Consolas, monospace", fontLigatures: true, scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 } }} />
+            <Editor height="min(58vh, 620px)" language={editorLanguage(selectedLanguage)} value={code} onChange={(value) => setCode(value || "")} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 14, lineHeight: 23, padding: { top: 18, bottom: 18 }, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: "on", automaticLayout: true, tabSize: 4, renderLineHighlight: "gutter", fontFamily: "'SF Mono', 'Cascadia Code', Consolas, monospace", fontLigatures: true, scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 } }} />
           </div>
-          <div className="flex items-center justify-between border-y border-white/[0.06] bg-[#14161a] px-3 sm:px-4">
-            <div className="flex items-center gap-1"><button type="button" onClick={() => setActivePane("input")} className={`border-b-2 px-3 py-3 text-xs font-medium ${activePane === "input" ? "border-indigo-300 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}><span className="inline-flex items-center gap-2"><Terminal className="h-3.5 w-3.5" />Input</span></button><button type="button" onClick={() => setActivePane("output")} className={`border-b-2 px-3 py-3 text-xs font-medium ${activePane === "output" ? "border-indigo-300 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>Output</button></div>
-            <span className="hidden items-center gap-1.5 text-[10px] text-zinc-600 sm:inline-flex"><Command className="h-3 w-3" /> + Enter to run</span>
-          </div>
-          {activePane === "input" ? <div className="p-3 sm:p-4"><textarea aria-label="Standard input" value={stdin} onChange={(event) => setStdin(event.target.value)} placeholder="Type program input here…" className="min-h-24 w-full resize-y rounded-lg border border-white/[0.06] bg-[#0c0e11] p-3 font-mono text-xs leading-5 text-zinc-300 outline-none placeholder:text-zinc-700 focus:border-indigo-300/30" /><p className="mt-2 text-[10px] text-zinc-600">Standard input is passed to your program when it runs.</p></div> : <div aria-live="polite" className="min-h-36 p-3 sm:p-4">
-            {result ? <><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${errorText ? "bg-rose-400/10 text-rose-300" : "bg-emerald-400/10 text-emerald-300"}`}><span className={`h-1.5 w-1.5 rounded-full ${errorText ? "bg-rose-300" : "bg-emerald-300"}`} />{result.status || (errorText ? "Error" : "Finished")}</span><span className="flex gap-3 text-[10px] text-zinc-600">{result.runtime && <span>Time {result.runtime}</span>}{result.memory && <span>Memory {result.memory}</span>}</span></div><pre className="max-h-60 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-5 text-zinc-300">{outputText || (errorText ? <span className="text-rose-300">{errorText}</span> : <span className="text-zinc-600">Program finished with no output.</span>)}</pre>{outputText && errorText && <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-5 text-rose-300">{errorText}</pre>}</> : <div className="grid min-h-28 place-items-center text-center text-xs text-zinc-600">{busy ? <span className="inline-flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-400/20 border-t-indigo-300" />Preparing a secure run…</span> : "Run your code to see the output here."}</div>}
-          </div>}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-2.5 text-[10px] text-zinc-600 sm:px-4"><span>Runs in a secure, isolated environment</span><span>Code is limited to 50 KB</span></div>
         </section>
-        <ActivityPanel activity={activity} recent={recent} />
+
+        <section className="flex min-h-[380px] min-w-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101216] shadow-2xl shadow-black/25 xl:min-h-[620px]">
+          <div className="flex min-h-[58px] items-center justify-between border-b border-white/[0.06] bg-[#14161a] px-3 sm:px-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-zinc-200"><Terminal className="h-4 w-4 text-emerald-300" />Run panel</div>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setActivePane("input")} className={`rounded-md px-3 py-2 text-xs font-medium ${activePane === "input" ? "bg-white/[0.07] text-white" : "text-zinc-500 hover:text-zinc-300"}`}>Input</button>
+              <button type="button" onClick={() => setActivePane("output")} className={`rounded-md px-3 py-2 text-xs font-medium ${activePane === "output" ? "bg-white/[0.07] text-white" : "text-zinc-500 hover:text-zinc-300"}`}>Output</button>
+            </div>
+          </div>
+          {activePane === "input" ? <div className="flex flex-1 flex-col p-3 sm:p-4"><textarea aria-label="Standard input" value={stdin} onChange={(event) => setStdin(event.target.value)} placeholder="Type program input here…" className="min-h-[240px] w-full flex-1 resize-y rounded-lg border border-white/[0.06] bg-[#0c0e11] p-3 font-mono text-xs leading-5 text-zinc-300 outline-none placeholder:text-zinc-700 focus:border-indigo-300/30" /><p className="mt-2 text-[10px] text-zinc-600">Standard input is passed to your program when it runs.</p></div> : <div aria-live="polite" className="min-h-[300px] flex-1 overflow-y-auto p-3 sm:p-4">
+            {result ? <><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${errorText ? "bg-rose-400/10 text-rose-300" : "bg-emerald-400/10 text-emerald-300"}`}><span className={`h-1.5 w-1.5 rounded-full ${errorText ? "bg-rose-300" : "bg-emerald-300"}`} />{result.status || (errorText ? "Error" : "Finished")}</span><span className="flex gap-3 text-[10px] text-zinc-600">{result.runtime && <span>Time {result.runtime}</span>}{result.memory && <span>Memory {result.memory}</span>}</span></div><pre className="max-h-[min(52vh,620px)] overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-5 text-zinc-300">{outputText || (errorText ? <span className="text-rose-300">{errorText}</span> : <span className="text-zinc-600">Program finished with no output.</span>)}</pre>{outputText && errorText && <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-5 text-rose-300">{errorText}</pre>}</> : <div className="grid min-h-[280px] place-items-center text-center text-xs text-zinc-600">{busy ? <span className="inline-flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-400/20 border-t-indigo-300" />Preparing a secure run…</span> : "Run your code to see the output here."}</div>}
+          </div>}
+          <div className="border-t border-white/[0.05] px-3 py-2.5 text-[10px] text-zinc-600 sm:px-4">Runs in a secure, isolated environment</div>
+        </section>
       </div>
+
+      <div className="mt-4"><ActivityPanel activity={activity} recent={recent} /></div>
 
       <div className="mt-5 flex flex-col justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.018] px-4 py-4 sm:flex-row sm:items-center sm:px-5"><div><p className="text-sm font-medium text-zinc-200">Your next step: solve something real.</p><p className="mt-1 text-xs text-zinc-500">Use the same editor inside every problem and contest.</p></div><div className="flex flex-wrap gap-2"><Link href="/problems" className="inline-flex h-9 items-center gap-2 rounded-lg bg-indigo-400 px-3.5 text-xs font-semibold text-[#111321] hover:bg-indigo-300">Explore problems <ArrowUpRight className="h-3.5 w-3.5" /></Link><Link href="/leaderboard" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] px-3.5 text-xs font-medium text-zinc-300 hover:bg-white/[0.04]">Scoreboard <ArrowUpRight className="h-3.5 w-3.5" /></Link></div></div>
     </main>
