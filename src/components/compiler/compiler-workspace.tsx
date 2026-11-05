@@ -256,6 +256,10 @@ export function CompilerWorkspace() {
 
       <div className="mt-4"><ActivityPanel activity={activity} recent={recent} /></div>
 
+      <div className="mt-6 flex justify-center">
+        <CompilerBannerAd />
+      </div>
+
       <section aria-labelledby="psg-resources-heading" className="mt-5 rounded-2xl border border-white/[0.06] bg-white/[0.018] p-5 sm:p-6">
         <div className="max-w-3xl">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-300">For the PSG student community</p>
@@ -273,3 +277,4 @@ export function CompilerWorkspace() {
     <Footer />
   </div>;
 }
+
