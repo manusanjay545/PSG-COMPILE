@@ -92,9 +92,10 @@ export function Navbar() {
   };
 
   const navLinks = [
+    { label: "Compiler", href: "/compiler", icon: Code2 },
     { label: "Problems", href: "/problems", icon: Code2 },
     { label: "Contests", href: "/contests", icon: Trophy },
-    { label: "Leaderboard", href: "/leaderboard", icon: BarChart3 },
+    { label: "Scoreboard", href: "/leaderboard", icon: BarChart3 },
     { label: "Roadmaps", href: "/roadmaps", icon: Compass },
     { label: "Institutions", href: "/institutions", icon: Building2 },
   ];
@@ -124,7 +125,9 @@ export function Navbar() {
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
-                const isActive = pathname.startsWith(link.href);
+                const isActive = link.href === "/compiler"
+                  ? pathname === "/" || pathname.startsWith("/compiler")
+                  : pathname.startsWith(link.href);
                 return (
                   <Link
                     key={link.href}

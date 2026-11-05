@@ -92,7 +92,11 @@ Add your production custom domain too, if you use one. For Google sign-in, enabl
 
 For a new project, execute `supabase/schema.sql` and `supabase/seed.sql` in the Supabase SQL editor. For an existing project, execute `supabase/auth_profiles_migration.sql` instead. It adds the profile fields, profile creation trigger, row security policies, and the public `avatars` bucket used for uploaded photos.
 
-### 5. Run Development Server
+### 5. Online compiler
+
+The home page compiler uses Judge0 CE. Set `JUDGE0_API_URL` to your Judge0-compatible host (for example `https://ce.judge0.com`) and, when required by your host, set `JUDGE0_API_KEY` as a server-only environment variable. The language picker loads every language enabled by that runtime. Never expose the key with a `NEXT_PUBLIC_` prefix.
+
+### 6. Run Development Server
 
 ```bash
 npm run dev
@@ -100,11 +104,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 6. Deploy on Vercel
+### 7. Deploy on Vercel
 
 Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY`) to the Vercel project’s Production, Preview, and Development environments. Callback URLs are derived from the current site origin; add each deployed `/auth/callback` URL to Supabase’s redirect allow list. Never expose a Supabase service-role key as a `NEXT_PUBLIC_` variable; the auth and profile flows use the publishable key with row-level security.
 
-### 7. Build for Production
+### 8. Build for Production
 
 ```bash
 npm run build
