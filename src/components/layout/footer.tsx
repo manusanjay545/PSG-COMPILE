@@ -84,11 +84,6 @@ export function Footer() {
               <li className="text-xs text-zinc-500">
                 Plagiarism & Similarity Engine
               </li>
-              <li>
-                <Link href="/admin" className="text-xs text-indigo-400 hover:underline">
-                  Administration Console
-                </Link>
-              </li>
             </ul>
           </div>
         </div>

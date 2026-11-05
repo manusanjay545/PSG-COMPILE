@@ -31,6 +31,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchDialog } from "@/components/search-dialog";
 import { Logo } from "@/components/ui/logo";
 import { createClient } from "@/lib/supabase/client";
+import { isAdminEmail } from "@/lib/auth/admin";
 
 type NavbarAccount = {
   id: string;
@@ -255,11 +256,11 @@ export function Navbar() {
                     My Profile
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                {account && isAdminEmail(account.email) && <DropdownMenuItem asChild>
                   <Link href="/admin" className="cursor-pointer text-indigo-400 focus:text-indigo-300">
                     Admin Portal
                   </Link>
-                </DropdownMenuItem>
+                </DropdownMenuItem>}
                 <DropdownMenuItem asChild>
                   <Link href="/settings" className="cursor-pointer">
                     Settings
