@@ -12,7 +12,7 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
   return (
     <div className={cn("inline-flex items-center gap-2.5", className)}>
       <div
-        className="relative box-border flex shrink-0 items-center justify-center rounded-[12px] bg-white p-0.5"
+        className="relative box-border flex shrink-0 items-center justify-center overflow-hidden rounded-[20%] bg-white shadow-sm ring-1 ring-black/5"
         style={{ width: size, height: size }}
       >
         <Image
@@ -20,7 +20,7 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
           alt="PSGCompile Logo"
           width={size}
           height={size}
-          className="h-full w-full object-contain"
+          className="h-full w-full rounded-[20%] object-contain"
           priority
           unoptimized
         />
@@ -38,3 +38,4 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
     </div>
   );
 }
+
