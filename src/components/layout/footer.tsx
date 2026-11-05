@@ -43,43 +43,27 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/roadmaps" className="hover:text-indigo-400 transition-colors">
-                  Learning Roadmaps
+                <Link href="/courses" className="hover:text-indigo-400 transition-colors">
+                  Programming Courses
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Institutions */}
+          {/* Courses */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-200">
-              Institutions
+              Learn
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/institutions/psg-college-of-technology" className="hover:text-indigo-400 transition-colors">
-                  PSG College of Technology
-                </Link>
+                <Link href="/courses?course=python" className="hover:text-indigo-400 transition-colors">Python</Link>
               </li>
               <li>
-                <Link href="/institutions/psg-polytechnic" className="hover:text-indigo-400 transition-colors">
-                  PSG Polytechnic College
-                </Link>
+                <Link href="/courses?course=java" className="hover:text-indigo-400 transition-colors">Java</Link>
               </li>
               <li>
-                <Link href="/institutions/psg-college-of-arts-science" className="hover:text-indigo-400 transition-colors">
-                  PSG College of Arts & Science
-                </Link>
-              </li>
-              <li>
-                <Link href="/institutions/psg-institute-of-technology" className="hover:text-indigo-400 transition-colors">
-                  PSG iTech
-                </Link>
-              </li>
-              <li>
-                <Link href="/institutions/psg-institute-of-management" className="hover:text-indigo-400 transition-colors">
-                  PSG Institute of Management
-                </Link>
+                <Link href="/courses?course=sql" className="hover:text-indigo-400 transition-colors">SQL</Link>
               </li>
             </ul>
           </div>

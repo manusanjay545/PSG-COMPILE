@@ -6,7 +6,6 @@ import {
   Code2,
   Trophy,
   Users,
-  Building2,
   ArrowRight,
 } from "lucide-react";
 import {
@@ -21,7 +20,6 @@ import {
 import {
   MOCK_PROBLEMS,
   MOCK_CONTESTS,
-  MOCK_INSTITUTIONS,
   MOCK_LEADERBOARD,
 } from "@/lib/data/mock-data";
 
@@ -116,24 +114,6 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
           ))}
         </CommandGroup>
 
-        <CommandSeparator />
-
-        <CommandGroup heading="Institutions">
-          {MOCK_INSTITUTIONS.map((inst) => (
-            <CommandItem
-              key={inst.id}
-              value={`institution ${inst.name} ${inst.short_name}`}
-              onSelect={() => handleSelect(`/institutions/${inst.slug}`)}
-              className="flex items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-emerald-400" />
-                <span className="font-medium text-zinc-200">{inst.name}</span>
-              </div>
-              <span className="text-xs text-zinc-500">{inst.short_name}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
       </CommandList>
     </CommandDialog>
   );

@@ -5,17 +5,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Code2,
+  BookOpen,
   Trophy,
   BarChart3,
-  Building2,
-  Compass,
   Search,
   Bell,
   Sun,
   Moon,
   Menu,
   X,
-  User as UserIcon,
   Flame,
   Award,
 } from "lucide-react";
@@ -94,10 +92,9 @@ export function Navbar() {
   const navLinks = [
     { label: "Compiler", href: "/compiler", icon: Code2 },
     { label: "Problems", href: "/problems", icon: Code2 },
+    { label: "Courses", href: "/courses", icon: BookOpen },
     { label: "Contests", href: "/contests", icon: Trophy },
     { label: "Scoreboard", href: "/leaderboard", icon: BarChart3 },
-    { label: "Roadmaps", href: "/roadmaps", icon: Compass },
-    { label: "Institutions", href: "/institutions", icon: Building2 },
   ];
 
   React.useEffect(() => {
