@@ -90,7 +90,8 @@ export default function ProblemsPage() {
       <main className="flex-1 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6 w-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Problem Archive</h1>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Coding problems for practice</h1>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-400">Explore programming challenges by topic and difficulty. Write a solution, run it against test cases, and build your problem-solving skills.</p>
             <p className="text-sm text-zinc-400">Practice with a verified bank of algorithm and data structure challenges.</p>
           </div>
           <Badge variant="outline" className="border-indigo-500/30 text-indigo-300 px-3 py-1 text-xs w-fit">

@@ -33,7 +33,7 @@ export default function CoursesPage() {
           <div className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
           <div className="relative max-w-3xl space-y-4">
             <Badge className="border border-indigo-300/20 bg-indigo-400/10 text-indigo-200"><GraduationCap className="mr-1.5 h-3.5 w-3.5" />Structured learning paths</Badge>
-            <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">Courses for builders.</h1>
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">Step-by-step programming courses</h1>
             <p className="max-w-2xl text-sm leading-6 text-zinc-300 sm:text-base">Learn one chapter at a time. Each chapter teaches the theory, walks through an example, then checks your understanding with five multiple-choice questions and a coding test. Pass both to unlock the next chapter.</p>
             <div className="flex flex-wrap gap-2 text-xs text-zinc-400"><span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5">{COURSES.length} courses</span><span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5">Lessons and tests in every chapter</span><span className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5">Certificates on completion</span></div>
           </div>

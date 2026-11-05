@@ -202,8 +202,8 @@ export function CompilerWorkspace() {
       <div className="mb-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div className="max-w-2xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[11px] font-medium text-emerald-200"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />Online compiler <span className="text-emerald-200/35">/</span> 60+ languages</div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.6rem]">An idea in. <span className="text-zinc-500">A solution out.</span></h1>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">Write, run, and refine code in your browser. Then take it straight into a PSG problem or contest.</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.6rem]">PSGCompile: <span className="text-zinc-500">online coding and practice.</span></h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">Compile code in 60+ languages, solve programming problems, and learn through guided courses. An independent coding platform for PSG College of Technology and the wider PSG student community.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500"><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Zap className="h-3.5 w-3.5 text-amber-300" />Fast isolated runtime</span><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Check className="h-3.5 w-3.5 text-emerald-300" />No setup needed</span></div>
       </div>
@@ -250,6 +250,18 @@ export function CompilerWorkspace() {
       </div>
 
       <div className="mt-4"><ActivityPanel activity={activity} recent={recent} /></div>
+
+      <section aria-labelledby="psg-resources-heading" className="mt-5 rounded-2xl border border-white/[0.06] bg-white/[0.018] p-5 sm:p-6">
+        <div className="max-w-3xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-300">For the PSG student community</p>
+          <h2 id="psg-resources-heading" className="mt-2 text-lg font-semibold text-white">Coding practice alongside campus resources</h2>
+          <p className="mt-2 text-sm leading-6 text-zinc-400">PSGCompile is an independent learning and coding platform. Use the official PSG ECampus for academic services, and PSG Bunker for its attendance tools.</p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            <a href="https://ecampus.psgtech.ac.in/" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white/[0.08] px-3 py-2 text-zinc-300 hover:border-indigo-400/40 hover:text-white">Official PSG ECampus <ArrowUpRight className="ml-1 inline h-3.5 w-3.5" /></a>
+            <a href="https://www.psgbunker.in.net/" target="_blank" rel="noopener noreferrer" className="rounded-lg border border-white/[0.08] px-3 py-2 text-zinc-300 hover:border-indigo-400/40 hover:text-white">PSG Bunker attendance tools <ArrowUpRight className="ml-1 inline h-3.5 w-3.5" /></a>
+          </div>
+        </div>
+      </section>
 
       <div className="mt-5 flex flex-col justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.018] px-4 py-4 sm:flex-row sm:items-center sm:px-5"><div><p className="text-sm font-medium text-zinc-200">Your next step: solve something real.</p><p className="mt-1 text-xs text-zinc-500">Use the same editor inside every problem and contest.</p></div><div className="flex flex-wrap gap-2"><Link href="/problems" className="inline-flex h-9 items-center gap-2 rounded-lg bg-indigo-400 px-3.5 text-xs font-semibold text-[#111321] hover:bg-indigo-300">Explore problems <ArrowUpRight className="h-3.5 w-3.5" /></Link><Link href="/leaderboard" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/[0.08] px-3.5 text-xs font-medium text-zinc-300 hover:bg-white/[0.04]">Scoreboard <ArrowUpRight className="h-3.5 w-3.5" /></Link></div></div>
     </main>
