@@ -42,6 +42,9 @@ async function languageIdFor(language: string) {
     c: /^C\s.*GCC/i,
     java: /^Java\s/i,
     javascript: /(JavaScript.*Node|Node\.js)/i,
+    go: /^Go\s\(/i,
+    rust: /^Rust\s\(/i,
+    sql: /^SQL\s\(/i,
   };
   const matcher = matchers[requested];
   if (!matcher) throw new Error("Choose one of the supported compiled languages.");

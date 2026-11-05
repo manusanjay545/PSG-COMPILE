@@ -983,3 +983,52 @@ EXECUTE FUNCTION public.sync_user_email_verification();
 REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
 REVOKE EXECUTE ON FUNCTION public.sync_user_email_verification() FROM PUBLIC, anon, authenticated;
 
+-- Course progression and issued certificates. Writes are performed by authenticated API routes using the service role.
+CREATE TABLE IF NOT EXISTS public.course_chapter_progress (
+  user_id UUID NOT NULL REFERENCES auth.users (id) ON DELETE CASCADE,
+  course_slug TEXT NOT NULL,
+  chapter_index INTEGER NOT NULL CHECK (chapter_index >= 0),
+  mcq_score SMALLINT NOT NULL CHECK (mcq_score = 5),
+  coding_passed BOOLEAN NOT NULL DEFAULT TRUE CHECK (coding_passed),
+  completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, course_slug, chapter_index)
+);
+
+CREATE TABLE IF NOT EXISTS public.course_certificates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users (id) ON DELETE CASCADE,
+  course_slug TEXT NOT NULL,
+  course_title TEXT NOT NULL,
+  certificate_code UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+  learner_name TEXT,
+  roll_number TEXT,
+  college_name TEXT,
+  department_name TEXT,
+  academic_year TEXT,
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, course_slug)
+);
+
+CREATE INDEX IF NOT EXISTS course_chapter_progress_user_course_idx ON public.course_chapter_progress (user_id, course_slug, chapter_index);
+CREATE INDEX IF NOT EXISTS course_certificates_user_issued_idx ON public.course_certificates (user_id, issued_at DESC);
+
+ALTER TABLE public.course_chapter_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_certificates ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own course progress" ON public.course_chapter_progress;
+CREATE POLICY "Users can view their own course progress"
+  ON public.course_chapter_progress FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "Users can view their own course certificates" ON public.course_certificates;
+CREATE POLICY "Users can view their own course certificates"
+  ON public.course_certificates FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+
+REVOKE ALL ON public.course_chapter_progress FROM anon, authenticated;
+GRANT SELECT ON public.course_chapter_progress TO authenticated;
+GRANT ALL ON public.course_chapter_progress TO service_role;
+REVOKE ALL ON public.course_certificates FROM anon, authenticated;
+GRANT SELECT ON public.course_certificates TO authenticated;
+GRANT ALL ON public.course_certificates TO service_role;
+

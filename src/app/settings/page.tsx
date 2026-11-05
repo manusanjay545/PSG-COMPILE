@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { AvatarPicker } from "@/components/profile/avatar-picker";
 import { LoadingIndicator } from "@/components/ui/loading-state";
+import { ProfileCertificates } from "@/components/courses/profile-certificates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -143,6 +144,7 @@ export default function SettingsPage() {
             <div className="flex justify-end"><Button type="submit" disabled={saving} className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700">{saving ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" />}{saving ? "Saving…" : "Save changes"}</Button></div>
           </form>
         )}
+        <ProfileCertificates />
       </main>
       <Footer />
     </div>

@@ -9,6 +9,7 @@ export type CourseModule = {
 export type Course = {
   slug: string;
   title: string;
+  language: string;
   badge: string;
   summary: string;
   level: string;
@@ -26,7 +27,7 @@ const moduleOf = (title: string, topics: string, lesson: string, example: string
 
 export const COURSES: Course[] = [
   {
-    slug: "python", title: "Python", badge: "Start here", level: "Beginner → Advanced", accent: "from-sky-500/20 to-blue-500/5",
+    slug: "python", title: "Python", language: "python", badge: "Start here", level: "Beginner → Advanced", accent: "from-sky-500/20 to-blue-500/5",
     summary: "A complete path from first print statement to object-oriented design, testing, data structures, and asynchronous programs.",
     modules: [
       moduleOf("First steps", "Install Python & run scripts|Variables, names & comments|Numbers, strings & booleans|Input, output & f-strings|Operators, precedence & conversions",
@@ -53,7 +54,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "c", title: "C", badge: "Systems", level: "Beginner → Advanced", accent: "from-cyan-500/20 to-teal-500/5",
+    slug: "c", title: "C", language: "c", badge: "Systems", level: "Beginner → Advanced", accent: "from-cyan-500/20 to-teal-500/5",
     summary: "Learn portable C from compilation and control flow through pointers, memory ownership, data structures, and debugging.",
     modules: [
       moduleOf("Compile and run", "Compiler, source & executable|main and return codes|printf / scanf|Types, variables & constants|Operators and casts|Warnings and compiler flags",
@@ -77,7 +78,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "cpp", title: "C++", badge: "Systems", level: "Beginner → Advanced", accent: "from-blue-500/20 to-indigo-500/5",
+    slug: "cpp", title: "C++", language: "cpp", badge: "Systems", level: "Beginner → Advanced", accent: "from-blue-500/20 to-indigo-500/5",
     summary: "A modern C++ path covering RAII, the standard library, templates, move semantics, concurrency, and safe design.",
     modules: [
       moduleOf("Modern C++ foundations", "Compiler & C++ standard|main, iostream & namespaces|auto and type deduction|const and references|Operators and expressions|Headers and separate compilation",
@@ -101,7 +102,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "java", title: "Java", badge: "Popular", level: "Beginner → Professional", accent: "from-orange-500/20 to-amber-500/5",
+    slug: "java", title: "Java", language: "java", badge: "Popular", level: "Beginner → Professional", accent: "from-orange-500/20 to-amber-500/5",
     summary: "Learn Java syntax, object-oriented design, collections, generics, streams, testing, concurrency, and JVM tooling.",
     modules: [
       moduleOf("Java and the JVM", "JDK, compiler & runtime|Class and main method|Variables and primitive types|Strings and operators|Console input/output|Packages and access modifiers",
@@ -125,7 +126,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "sql", title: "SQL", badge: "Data", level: "Beginner → Advanced", accent: "from-violet-500/20 to-fuchsia-500/5",
+    slug: "sql", title: "SQL", language: "sql", badge: "Data", level: "Beginner → Advanced", accent: "from-violet-500/20 to-fuchsia-500/5",
     summary: "A practical SQL course from relational thinking to joins, window functions, transactions, indexing, and query tuning.",
     modules: [
       moduleOf("Relational foundations", "Tables, rows & columns|Primary and foreign keys|NULL and three-valued logic|Data types & constraints|Create and alter tables|Normalization and relationships",
@@ -149,7 +150,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "javascript", title: "JavaScript", badge: "Web", level: "Beginner → Advanced", accent: "from-yellow-500/20 to-amber-500/5",
+    slug: "javascript", title: "JavaScript", language: "javascript", badge: "Web", level: "Beginner → Advanced", accent: "from-yellow-500/20 to-amber-500/5",
     summary: "Build strong JavaScript fundamentals for browsers and servers: functions, objects, async code, DOM, modules, and testing.",
     modules: [
       moduleOf("Language basics", "Run JS in browser and Node|let, const & values|Numbers, strings & booleans|Operators and coercion|Template literals|Console and debugging",
@@ -173,7 +174,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "typescript", title: "TypeScript", badge: "Web", level: "JavaScript → Advanced", accent: "from-blue-500/20 to-sky-500/5",
+    slug: "typescript", title: "TypeScript", language: "javascript", badge: "Web", level: "JavaScript → Advanced", accent: "from-blue-500/20 to-sky-500/5",
     summary: "Add reliable static types to JavaScript with narrowing, generics, API modeling, strict configuration, and application patterns.",
     modules: [
       moduleOf("Types and compiler setup", "TypeScript compiler and tsconfig|Primitive types and inference|Arrays, tuples & readonly|Object types and aliases|any, unknown & never|Strict mode and declaration errors",
@@ -197,7 +198,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "go", title: "Go", badge: "Backend", level: "Beginner → Advanced", accent: "from-cyan-500/20 to-blue-500/5",
+    slug: "go", title: "Go", language: "go", badge: "Backend", level: "Beginner → Advanced", accent: "from-cyan-500/20 to-blue-500/5",
     summary: "Learn Go from packages and interfaces through concurrency, HTTP services, testing, profiling, and deployment.",
     modules: [
       moduleOf("Go basics", "Go toolchain and modules|Packages and main|Variables and constants|Primitive types and conversions|fmt input/output|Pointers and zero values",
@@ -221,7 +222,7 @@ export const COURSES: Course[] = [
     ],
   },
   {
-    slug: "rust", title: "Rust", badge: "Systems", level: "Beginner → Advanced", accent: "from-rose-500/20 to-orange-500/5",
+    slug: "rust", title: "Rust", language: "rust", badge: "Systems", level: "Beginner → Advanced", accent: "from-rose-500/20 to-orange-500/5",
     summary: "Master ownership, borrowing, enums, traits, iterators, error handling, async, and safe systems programming.",
     modules: [
       moduleOf("Toolchain and syntax", "rustup, cargo & crates|main and println!|let, mut and shadowing|Scalar and compound types|Functions and expressions|Control flow and loops",
