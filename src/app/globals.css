@@ -47,22 +47,102 @@
 }
 
 html.light {
-  --background: #f1f3f6;
+  color-scheme: light;
+  --background: #f3f5f8;
   --foreground: #18181b;
+  --surface: #ffffff;
+  --surface-muted: #f7f8fa;
+  --surface-raised: #edf0f4;
+  --line: #e1e5eb;
 }
 html.light body { background-color: var(--background); color: var(--foreground); }
-html.light .bg-zinc-950 { background-color: #f5f6f8 !important; }
-html.light .bg-zinc-950\/80 { background-color: rgb(245 246 248 / 0.94) !important; }
-html.light .bg-zinc-900, html.light .bg-zinc-900\/60, html.light .bg-zinc-900\/70, html.light .bg-zinc-900\/90 { background-color: #fff !important; }
-html.light .bg-zinc-800, html.light .bg-zinc-800\/80 { background-color: #e7eaf0 !important; }
-html.light [class~="bg-[#0b0c0f]"] { background-color: #f1f3f6 !important; }
-html.light [class~="bg-[#0c0e11]"], html.light [class~="bg-[#0d0f12]"], html.light [class~="bg-[#101216]"] { background-color: #f8f9fb !important; color: #18181b; }
-html.light [class~="bg-[#14161a]"], html.light [class~="bg-[#1a1c21]"] { background-color: #eef1f5 !important; color: #18181b; }
-html.light [class~="bg-[#0b0c0f]"] .text-white, html.light [class~="bg-[#0c0e11]"] .text-white, html.light [class~="bg-[#0d0f12]"] .text-white, html.light [class~="bg-[#101216]"] .text-white, html.light [class~="bg-[#14161a]"] .text-white, html.light [class~="bg-[#1a1c21]"] .text-white { color: #18181b !important; }
-html.light .shadow-2xl { box-shadow: 0 12px 32px rgb(15 23 42 / 0.08) !important; }
-html.light .shadow-xl { box-shadow: 0 8px 24px rgb(15 23 42 / 0.06) !important; }
-html.light .text-zinc-100, html.light .text-zinc-200 { color: #18181b !important; }
-html.light .text-zinc-300 { color: #3f3f46 !important; }
-html.light .text-zinc-400 { color: #52525b !important; }
-html.light .text-zinc-500, html.light .text-zinc-600 { color: #71717a !important; }
-html.light .border-zinc-800, html.light .border-zinc-700 { border-color: #d4d9e2 !important; }
+
+/* Calm neutral surfaces for the light palette. */
+html.light [class~="bg-zinc-950"] { background-color: var(--background) !important; }
+html.light [class~="bg-zinc-950/80"] { background-color: rgb(255 255 255 / 0.92) !important; }
+html.light [class~="bg-zinc-900"],
+html.light [class~="bg-zinc-900/60"],
+html.light [class~="bg-zinc-900/70"],
+html.light [class~="bg-zinc-900/90"] { background-color: var(--surface) !important; }
+html.light [class~="bg-zinc-800"],
+html.light [class~="bg-zinc-800/80"] { background-color: var(--surface-raised) !important; }
+html.light [class~="bg-[#0b0c0f]"] { background-color: var(--background) !important; }
+html.light [class~="bg-[#0c0e11]"],
+html.light [class~="bg-[#0d0f12]"],
+html.light [class~="bg-[#101216]"] { background-color: var(--surface) !important; }
+html.light [class~="bg-[#14161a]"] { background-color: var(--surface-muted) !important; }
+html.light [class~="bg-[#1a1c21]"] { background-color: var(--surface-raised) !important; }
+html.light [class~="hover:bg-zinc-800"]:hover { background-color: var(--surface-raised) !important; }
+
+/* Retint dark gradient panels; keep the branded certificate artwork dark. */
+html.light [class*="bg-gradient-"][class~="via-zinc-900"],
+html.light [class*="bg-gradient-"][class~="to-zinc-950"],
+html.light [class*="bg-gradient-"][class~="to-zinc-900"] {
+  background-image: linear-gradient(135deg, #ffffff 0%, #f6f8fb 100%) !important;
+}
+html.light [class~="bg-gradient-to-br"][class~="from-red-950/40"] {
+  background-image: linear-gradient(135deg, #fff8f7 0%, #ffffff 100%) !important;
+}
+html.light [class~="from-[#13142b]"] {
+  background-image: linear-gradient(135deg, #17182f 0%, #20193a 55%, #171126 100%) !important;
+  box-shadow: 0 18px 50px rgb(10 10 30 / 0.4) !important;
+}
+
+/* Replace dark-mode white overlays and borders with quiet slate surfaces. */
+html.light [class*="bg-white/"] { background-color: rgb(30 41 59 / 0.035) !important; }
+html.light [class*="bg-black/"]:not([class~="bg-black/80"]) { background-color: rgb(30 41 59 / 0.04) !important; }
+html.light [class~="from-[#13142b]"] [class*="bg-white/"] { background-color: rgb(255 255 255 / 0.05) !important; }
+html.light [class*="border-white/"] { border-color: var(--line) !important; }
+html.light [class~="from-[#13142b]"] [class*="border-white/"] { border-color: rgb(255 255 255 / 0.2) !important; }
+html.light [class*="border-zinc-800"],
+html.light [class*="border-zinc-700"] { border-color: var(--line) !important; }
+
+/* Stronger text contrast for headings, captions, and colored accents. */
+html.light [class~="text-white"],
+html.light [class~="text-zinc-100"],
+html.light [class~="text-zinc-200"] { color: #18181b !important; }
+html.light [class~="text-zinc-300"] { color: #3f4652 !important; }
+html.light [class~="text-zinc-400"] { color: #586273 !important; }
+html.light [class~="text-zinc-500"],
+html.light [class~="text-zinc-600"] { color: #697386 !important; }
+html.light [class*="text-indigo-100"], html.light [class*="text-indigo-200"], html.light [class*="text-indigo-300"], html.light [class*="text-indigo-400"] { color: #4338a8 !important; }
+html.light [class*="text-violet-100"], html.light [class*="text-violet-200"], html.light [class*="text-violet-300"], html.light [class*="text-violet-400"] { color: #6d28d9 !important; }
+html.light [class*="text-emerald-100"], html.light [class*="text-emerald-200"], html.light [class*="text-emerald-300"], html.light [class*="text-emerald-400"] { color: #087443 !important; }
+html.light [class*="text-green-100"], html.light [class*="text-green-200"], html.light [class*="text-green-300"], html.light [class*="text-green-400"] { color: #087443 !important; }
+html.light [class*="text-amber-100"], html.light [class*="text-amber-200"], html.light [class*="text-amber-300"], html.light [class*="text-amber-400"] { color: #985b00 !important; }
+html.light [class*="text-rose-100"], html.light [class*="text-rose-200"], html.light [class*="text-rose-300"], html.light [class*="text-rose-400"] { color: #be123c !important; }
+html.light [class*="text-blue-100"], html.light [class*="text-blue-200"], html.light [class*="text-blue-300"], html.light [class*="text-blue-400"] { color: #1d4ed8 !important; }
+html.light [class*="text-cyan-100"], html.light [class*="text-cyan-200"], html.light [class*="text-cyan-300"], html.light [class*="text-cyan-400"] { color: #0e7490 !important; }
+html.light [class*="text-red-200"], html.light [class*="text-red-300"], html.light [class*="text-red-400"] { color: #b42318 !important; }
+
+/* Keep labels legible on filled action buttons and the dark certificate artwork. */
+html.light [class~="text-white"][class~="bg-indigo-600"],
+html.light [class~="text-white"][class~="bg-indigo-500"],
+html.light [class~="text-white"][class~="bg-violet-600"],
+html.light [class~="text-white"][class~="bg-blue-600"],
+html.light [class~="text-white"][class~="bg-emerald-600"],
+html.light [class~="text-white"][class~="bg-rose-600"],
+html.light [class~="text-white"][class~="bg-primary"] { color: #fff !important; }
+html.light [class~="from-[#13142b]"] [class~="text-white"],
+html.light [class~="from-[#13142b]"] [class~="text-indigo-100"],
+html.light [class~="from-[#13142b]"] [class~="text-indigo-200"],
+html.light [class~="from-[#13142b]"] [class~="text-violet-200"] { color: #f5f3ff !important; }
+html.light [class~="from-[#13142b]"] [class~="text-zinc-200"] { color: #e4e4e7 !important; }
+html.light [class~="from-[#13142b]"] [class~="text-zinc-300"] { color: #d4d4d8 !important; }
+html.light [class~="from-[#13142b]"] [class~="text-zinc-400"] { color: #a1a1aa !important; }
+html.light [class~="from-[#13142b]"] [class~="text-zinc-500"] { color: #71717a !important; }
+html.light [class~="from-[#13142b]"] [class~="text-amber-300"] { color: #fcd34d !important; }
+html.light [class~="from-[#13142b]"] [class~="text-indigo-300"] { color: #c7d2fe !important; }
+
+/* Make the interface feel layered without heavy dark shadows. */
+html.light [class*="shadow-black/"] { --tw-shadow-color: rgb(15 23 42 / 0.07) !important; }
+html.light .shadow-2xl { box-shadow: 0 14px 36px rgb(15 23 42 / 0.08) !important; }
+html.light .shadow-xl { box-shadow: 0 8px 24px rgb(15 23 42 / 0.055) !important; }
+html.light [class*="bg-gradient-"]:not([class~="from-[#13142b]"]) { box-shadow: 0 8px 24px rgb(15 23 42 / 0.045); }
+html.light [class~="focus-visible:ring-offset-zinc-950"] { --tw-ring-offset-color: #fff !important; }
+
+html.light input,
+html.light textarea,
+html.light select { color-scheme: light; }
+html.light ::selection { background: #dbe4ff; color: #1e1b4b; }
+
