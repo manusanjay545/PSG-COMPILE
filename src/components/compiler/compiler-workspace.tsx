@@ -45,19 +45,47 @@ function editorLanguage(name: string) {
 }
 
 function starterCode(name: string) {
-  const language = editorLanguage(name);
-  if (language === "python") return 'name = input()\nprint(f"Hello, {name}!")\n';
-  if (language === "cpp") return '#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string name;\n    getline(cin, name);\n    cout << "Hello, " << name << "!\\n";\n    return 0;\n}\n';
-  if (language === "c") return '#include <stdio.h>\n\nint main(void) {\n    char name[100];\n    fgets(name, sizeof(name), stdin);\n    printf("Hello, %s!", name);\n    return 0;\n}\n';
-  if (language === "javascript") return 'const name = require("fs").readFileSync(0, "utf8").trim();\nconsole.log(`Hello, ${name}!`);\n';
-  if (language === "typescript") return 'import * as fs from "fs";\nconst name = fs.readFileSync(0, "utf8").trim();\nconsole.log(`Hello, ${name}!`);\n';
-  if (language === "java") return 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner input = new Scanner(System.in);\n        String name = input.nextLine();\n        System.out.println("Hello, " + name + "!");\n    }\n}\n';
-  if (language === "go") return 'package main\n\nimport (\n    "bufio"\n    "fmt"\n    "os"\n    "strings"\n)\n\nfunc main() {\n    name, _ := bufio.NewReader(os.Stdin).ReadString(\'\\n\')\n    fmt.Println("Hello, " + strings.TrimSpace(name) + "!")\n}\n';
-  if (language === "rust") return 'use std::io;\n\nfn main() {\n    let mut name = String::new();\n    io::stdin().read_line(&mut name).unwrap();\n    println!("Hello, {}!", name.trim());\n}\n';
-  if (language === "ruby") return 'name = STDIN.gets&.chomp || "world"\nputs "Hello, #{name}!"\n';
-  if (language === "php") return '<?php\n$name = trim(stream_get_contents(STDIN));\necho "Hello, {$name}!\\n";\n';
-  if (language === "csharp") return 'using System;\n\nclass Program {\n    static void Main() {\n        var name = Console.ReadLine();\n        Console.WriteLine($"Hello, {name}!");\n    }\n}\n';
-  return "// Write your program here\n";
+  const value = name.toLowerCase();
+  if (value.startsWith("python (2")) return 'print "Hello, world!"\n';
+  if (value.includes("python")) return 'print("Hello, world!")\n';
+  if (value.startsWith("assembly (nasm")) return 'global _start\nsection .text\n_start:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, message\n    mov rdx, message_len\n    syscall\n    mov rax, 60\n    xor rdi, rdi\n    syscall\nsection .data\nmessage db "Hello, world!", 10\nmessage_len equ $ - message\n';
+  if (value.startsWith("bash")) return "printf 'Hello, world!\\n'\n";
+  if (value.startsWith("basic")) return 'Print "Hello, world!"\n';
+  if (/^c\+\+/.test(value)) return '#include <iostream>\n\nint main() {\n    std::cout << "Hello, world!\\n";\n    return 0;\n}\n';
+  if (/^c\s/.test(value)) return '#include <stdio.h>\n\nint main(void) {\n    puts("Hello, world!");\n    return 0;\n}\n';
+  if (value.startsWith("clojure")) return '(println "Hello, world!")\n';
+  if (value.startsWith("c#")) return 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, world!");\n    }\n}\n';
+  if (value.startsWith("cobol")) return '       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.\n       PROCEDURE DIVISION.\n           DISPLAY "Hello, world!".\n           STOP RUN.\n';
+  if (value.startsWith("common lisp")) return '(format t "Hello, world!~%")\n';
+  if (value.startsWith("dart")) return "void main() {\n  print('Hello, world!');\n}\n";
+  if (value.startsWith("d (")) return 'import std.stdio;\n\nvoid main() {\n    writeln("Hello, world!");\n}\n';
+  if (value.startsWith("elixir")) return 'IO.puts("Hello, world!")\n';
+  if (value.startsWith("erlang")) return '-module(main).\n-export([main/0]).\n\nmain() ->\n    io:format("Hello, world!~n"),\n    halt().\n';
+  if (value.startsWith("f#")) return 'printfn "Hello, world!"\n';
+  if (value.startsWith("fortran")) return 'program hello\n  print *, "Hello, world!"\nend program hello\n';
+  if (value.startsWith("go (")) return 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, world!")\n}\n';
+  if (value.startsWith("groovy")) return 'println "Hello, world!"\n';
+  if (value.startsWith("haskell")) return 'main = putStrLn "Hello, world!"\n';
+  if (value.startsWith("javafx") || value.startsWith("java (")) return 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, world!");\n    }\n}\n';
+  if (value.startsWith("javascript")) return 'console.log("Hello, world!");\n';
+  if (value.startsWith("kotlin")) return 'fun main() {\n    println("Hello, world!")\n}\n';
+  if (value.startsWith("lua")) return 'print("Hello, world!")\n';
+  if (value.startsWith("objective-c")) return '#include <stdio.h>\n\nint main(void) {\n    puts("Hello, world!");\n    return 0;\n}\n';
+  if (value.startsWith("ocaml")) return 'print_endline "Hello, world!"\n';
+  if (value.startsWith("octave")) return "disp('Hello, world!');\n";
+  if (value.startsWith("pascal")) return 'program Hello;\nbegin\n  writeln("Hello, world!");\nend.\n';
+  if (value.startsWith("perl")) return 'print "Hello, world!\\n";\n';
+  if (value.startsWith("php")) return '<?php\necho "Hello, world!\\n";\n';
+  if (value.startsWith("prolog")) return ":- initialization(main).\n\nmain :-\n    writeln('Hello, world!'),\n    halt.\n";
+  if (value.startsWith("r (")) return 'cat("Hello, world!\\n")\n';
+  if (value.startsWith("ruby")) return 'puts "Hello, world!"\n';
+  if (value.startsWith("rust")) return 'fn main() {\n    println!("Hello, world!");\n}\n';
+  if (value.startsWith("scala")) return 'object Main {\n  def main(args: Array[String]): Unit = {\n    println("Hello, world!")\n  }\n}\n';
+  if (value.startsWith("sql")) return "SELECT 'Hello, world!' AS message;\n";
+  if (value.startsWith("swift")) return 'print("Hello, world!")\n';
+  if (value.startsWith("typescript")) return 'console.log("Hello, world!");\n';
+  if (value.startsWith("visual basic")) return 'Module Program\n    Sub Main()\n        Console.WriteLine("Hello, world!")\n    End Sub\nEnd Module\n';
+  return "";
 }
 
 function localDateKey(date = new Date()) {

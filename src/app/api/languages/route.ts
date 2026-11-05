@@ -12,11 +12,14 @@ export async function GET() {
     if (!response.ok) throw new Error(`Language service returned ${response.status}.`);
     const data: unknown = await response.json();
     if (!Array.isArray(data)) throw new Error("Language service returned an invalid list.");
+    const unsupportedLanguages = new Set(["Executable", "Multi-file program", "Plain Text"]);
     const languages = data
       .filter((item): item is { id: number; name: string } => Number.isInteger(item?.id) && typeof item?.name === "string")
+      .filter(({ name }) => !unsupportedLanguages.has(name))
       .map(({ id, name }) => ({ id, name }));
     return NextResponse.json(languages, { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Could not load languages." }, { status: 502 });
   }
 }
+
