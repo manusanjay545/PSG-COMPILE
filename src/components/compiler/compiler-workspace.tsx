@@ -199,7 +199,7 @@ export function CompilerWorkspace() {
   return <div className="min-h-screen bg-[#0b0c0f] text-zinc-100">
     <Navbar />
     <main className="mx-auto w-full max-w-[1500px] px-3 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-9">
-      <div className="mb-6 flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+      <div className="mb-6 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,728px)]">
         <div className="max-w-2xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[11px] font-medium text-emerald-200"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />Online compiler <span className="text-emerald-200/35">/</span> 60+ languages</div>
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.6rem]">PSGCompile: <span className="text-zinc-500">online coding and practice.</span></h1>

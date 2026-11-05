@@ -18,32 +18,32 @@ const adDocument = `<!doctype html>
 const bannerAdDocument = `<!doctype html>
 <html lang="en">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-  <body style="margin:0;width:320px;height:50px;background:#101216;overflow:hidden">
+  <body style="margin:0;width:728px;height:90px;background:#101216;overflow:hidden">
     <script>
       atOptions = {
-        'key' : '15baa81b8b0f18f073ef252d7448ec56',
+        'key' : '26e0e27c38945c6b747d0fc64c378387',
         'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
+        'height' : 90,
+        'width' : 728,
         'params' : {}
       };
     </script>
-    <script src="https://www.highrevenueformat.com/15baa81b8b0f18f073ef252d7448ec56/invoke.js"></script>
+    <script src="https://bauval.org/22/26e0e27c38945c6b747d0fc64c378387"></script>
   </body>
 </html>`;
 
 export function CompilerBannerAd() {
-  return <aside className="w-full max-w-[320px]" aria-label="Sponsored banner">
+  return <aside className="w-full max-w-[728px] overflow-hidden" aria-label="Sponsored banner">
     <span className="mb-1 block text-right text-[9px] font-medium uppercase tracking-[0.16em] text-zinc-600">Sponsored</span>
     <iframe
       title="Advertisement"
       srcDoc={bannerAdDocument}
-      width={320}
-      height={50}
+      width={728}
+      height={90}
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
-      className="max-w-full rounded-lg border border-white/[0.07] bg-[#101216]"
+      className="block max-w-full rounded-lg border border-white/[0.07] bg-[#101216]"
     />
   </aside>;
 }
