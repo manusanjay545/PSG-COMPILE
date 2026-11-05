@@ -12,7 +12,7 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
   return (
     <div className={cn("inline-flex items-center gap-2.5", className)}>
       <div
-        className="relative flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-md shadow-indigo-500/20"
+        className="relative flex items-center justify-center shrink-0"
         style={{ width: size, height: size }}
       >
         <Image
@@ -22,6 +22,7 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
           height={size}
           className="object-contain w-full h-full"
           priority
+          unoptimized
         />
       </div>
       {showText && (
