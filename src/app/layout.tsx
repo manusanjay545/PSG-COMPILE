@@ -17,6 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://psgcompile.vercel.app"),
   applicationName: "PSGCompile",
+  verification: {
+    google: "-GWpEfcI045WZzB6J1N9C3zyJySzN6DEfwbnDMMi15k",
+  },
   title: {
     default: "PSGCompile | Online Compiler & Coding Practice for PSG Students",
     template: "%s | PSGCompile",
