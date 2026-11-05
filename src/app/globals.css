@@ -46,11 +46,17 @@
   padding-top: 4px;
 }
 
-html.light body { background-color: #f4f6fb; color: #18181b; }
+html.light {
+  --background: #f4f6fb;
+  --foreground: #18181b;
+}
+html.light body { background-color: var(--background); color: var(--foreground); }
 html.light .bg-zinc-950 { background-color: #f8fafc !important; }
 html.light .bg-zinc-950\/80 { background-color: rgb(248 250 252 / 0.92) !important; }
 html.light .bg-zinc-900, html.light .bg-zinc-900\/60, html.light .bg-zinc-900\/70, html.light .bg-zinc-900\/90 { background-color: #fff !important; }
 html.light .bg-zinc-800, html.light .bg-zinc-800\/80 { background-color: #e9edf4 !important; }
+html.light [class~="bg-[#0b0c0f]"], html.light [class~="bg-[#0c0e11]"], html.light [class~="bg-[#0d0f12]"], html.light [class~="bg-[#101216]"], html.light [class~="bg-[#14161a]"], html.light [class~="bg-[#1a1c21]"] { background-color: #fff !important; color: #18181b; }
+html.light [class~="bg-[#0b0c0f]"] .text-white, html.light [class~="bg-[#0c0e11]"] .text-white, html.light [class~="bg-[#0d0f12]"] .text-white, html.light [class~="bg-[#101216]"] .text-white, html.light [class~="bg-[#14161a]"] .text-white, html.light [class~="bg-[#1a1c21]"] .text-white { color: #18181b !important; }
 html.light .text-zinc-100, html.light .text-zinc-200 { color: #18181b !important; }
 html.light .text-zinc-300 { color: #3f3f46 !important; }
 html.light .text-zinc-400 { color: #52525b !important; }

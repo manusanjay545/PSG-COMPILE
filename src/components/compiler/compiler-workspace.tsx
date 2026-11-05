@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, LoaderCircle, Play, RotateCcw, Terminal, Trophy, Zap } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -106,6 +107,7 @@ function ActivityPanel({ activity, recent }: { activity: ActivityDay[]; recent: 
 }
 
 export function CompilerWorkspace() {
+  const { resolvedTheme } = useTheme();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [languageId, setLanguageId] = useState(0);
   const [code, setCode] = useState("print(\"Hello, world!\")\n");
@@ -231,7 +233,7 @@ export function CompilerWorkspace() {
           </div>
           {languageError && <div role="alert" className="border-b border-amber-300/10 bg-amber-300/[0.04] px-4 py-2 text-xs text-amber-200">{languageError} Set a working JUDGE0_API_URL to enable the compiler.</div>}
           <div className="overflow-hidden bg-[#101216]">
-            <Editor height="min(58vh, 620px)" language={editorLanguage(selectedLanguage)} value={code} onChange={(value) => setCode(value || "")} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 14, lineHeight: 23, padding: { top: 18, bottom: 18 }, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: "on", automaticLayout: true, tabSize: 4, renderLineHighlight: "gutter", fontFamily: "'SF Mono', 'Cascadia Code', Consolas, monospace", fontLigatures: true, scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 } }} />
+            <Editor height="min(58vh, 620px)" language={editorLanguage(selectedLanguage)} value={code} onChange={(value) => setCode(value || "")} theme={resolvedTheme === "light" ? "light" : "vs-dark"} options={{ minimap: { enabled: false }, fontSize: 14, lineHeight: 23, padding: { top: 18, bottom: 18 }, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: "on", automaticLayout: true, tabSize: 4, renderLineHighlight: "gutter", fontFamily: "'SF Mono', 'Cascadia Code', Consolas, monospace", fontLigatures: true, scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 } }} />
           </div>
           {!hasRun && <div className="border-t border-white/[0.05] p-3 sm:p-4"><label htmlFor="initial-stdin" className="mb-2 block text-xs font-medium text-zinc-400">Standard input <span className="font-normal text-zinc-600">(optional)</span></label><textarea id="initial-stdin" aria-label="Standard input before first run" value={stdin} onChange={(event) => setStdin(event.target.value)} placeholder="Enter input for your program, if needed…" rows={3} className="w-full resize-y rounded-lg border border-white/[0.06] bg-[#0c0e11] p-3 font-mono text-xs leading-5 text-zinc-300 outline-none placeholder:text-zinc-700 focus:border-indigo-300/30" /></div>}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-2.5 text-[10px] text-zinc-600 sm:px-4"><span>Runs in a secure, isolated environment</span><span>Code is limited to 50 KB</span></div>
