@@ -203,12 +203,12 @@ export function CompilerWorkspace() {
         <div className="max-w-2xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[0.06] px-3 py-1.5 text-[11px] font-medium text-emerald-200"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />Online compiler <span className="text-emerald-200/35">/</span> 60+ languages</div>
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.6rem]">PSGCompile: <span className="text-zinc-500">online coding and practice.</span></h1>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">Compile code in 60+ languages, solve programming problems, and learn through guided courses. An independent coding platform for PSG College of Technology and the wider PSG student community.</p>
         </div>
         <div className="flex w-full flex-col items-start gap-3 sm:items-end">
           <CompilerBannerAd />
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500"><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Zap className="h-3.5 w-3.5 text-amber-300" />Fast isolated runtime</span><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Check className="h-3.5 w-3.5 text-emerald-300" />No setup needed</span></div>
         </div>
+        <p className="col-span-full max-w-none text-sm leading-6 text-zinc-400">Compile code in 60+ languages, solve programming problems, and learn through guided courses. An independent coding platform for PSG College of Technology and the wider PSG student community.</p>
       </div>
 
       <div className={`grid min-w-0 gap-4 ${hasRun ? "xl:grid-cols-[160px_minmax(0,1fr)_minmax(320px,0.76fr)]" : "xl:grid-cols-[160px_minmax(0,1fr)]"}`}>
