@@ -12,15 +12,15 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
   return (
     <div className={cn("inline-flex items-center gap-2.5", className)}>
       <div
-        className="relative flex items-center justify-center shrink-0"
+        className="relative box-border flex shrink-0 items-center justify-center rounded-[12px] bg-white p-0.5"
         style={{ width: size, height: size }}
       >
         <Image
-          src="/logo.png"
+          src="/favicon.png"
           alt="PSGCompile Logo"
           width={size}
           height={size}
-          className="object-contain w-full h-full"
+          className="h-full w-full object-contain"
           priority
           unoptimized
         />
@@ -38,3 +38,4 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
     </div>
   );
 }
+

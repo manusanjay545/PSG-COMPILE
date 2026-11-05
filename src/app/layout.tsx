@@ -34,10 +34,9 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: "/icon-512.png",
+    apple: [{ url: "/favicon.png", type: "image/png", sizes: "512x512" }],
   },
 };
 
@@ -56,3 +55,4 @@ export default function RootLayout({
     </html>
   );
 }
+
