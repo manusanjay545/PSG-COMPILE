@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- ENUMS
 -- ============================================================
 CREATE TYPE user_role AS ENUM ('student', 'moderator', 'problem_setter', 'institution_admin', 'super_admin');
-CREATE TYPE difficulty_level AS ENUM ('easy', 'medium', 'hard');
+CREATE TYPE difficulty_level AS ENUM ('easy', 'medium', 'hard', 'very_hard');
 CREATE TYPE submission_verdict AS ENUM ('accepted', 'wrong_answer', 'time_limit_exceeded', 'memory_limit_exceeded', 'runtime_error', 'compilation_error', 'internal_error', 'pending');
 CREATE TYPE contest_status AS ENUM ('draft', 'scheduled', 'active', 'ended', 'cancelled');
 CREATE TYPE contest_type AS ENUM ('psg_wide', 'institution', 'department', 'batch', 'club', 'weekly', 'monthly', 'placement', 'hackathon', 'special');
@@ -179,6 +179,7 @@ CREATE TABLE problems (
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   difficulty difficulty_level NOT NULL DEFAULT 'easy',
+  topic TEXT NOT NULL DEFAULT 'arrays',
   description TEXT NOT NULL, -- Markdown
   constraints TEXT,
   input_format TEXT,
@@ -187,6 +188,8 @@ CREATE TABLE problems (
   hints JSONB DEFAULT '[]'::jsonb,
   editorial TEXT, -- Markdown
   starter_code JSONB DEFAULT '{}'::jsonb, -- {language_slug: code}
+  solution_code JSONB NOT NULL DEFAULT '{}'::jsonb, -- Official runnable reference solutions
+  diagram TEXT, -- Accessible text diagram for the problem statement
   -- Stats
   submission_count INT DEFAULT 0,
   accepted_count INT DEFAULT 0,

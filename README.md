@@ -1,5 +1,16 @@
 # PSGCompile
 
+## Problem archive
+
+The archive contains 5,000 deterministic problem variants stored in Supabase:
+
+- 2,500 easy
+- 1,500 medium
+- 500 hard
+- 500 very hard
+
+Every problem has a statement, input/output format, constraints, a readable diagram, a Python reference solution, two visible samples, and three hidden test cases. Run `npm run problems:verify` to check the archive counts and execute all 25,000 test cases against their reference solutions. Run `npm run problems:seed` with `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set locally to idempotently seed a Supabase project. The service key is used only by the local seed script and must never be exposed as a public environment variable.
+
 > **Code. Compete. Climb.**  
 > *One PSG. One Coding Community.*
 

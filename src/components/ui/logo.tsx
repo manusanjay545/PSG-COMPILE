@@ -38,4 +38,3 @@ export function Logo({ className, size = 36, showText = false }: LogoProps) {
     </div>
   );
 }
-

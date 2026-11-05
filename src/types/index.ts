@@ -4,7 +4,7 @@
 
 // Enums
 export type UserRole = "student" | "moderator" | "problem_setter" | "institution_admin" | "super_admin";
-export type Difficulty = "easy" | "medium" | "hard";
+export type Difficulty = "easy" | "medium" | "hard" | "very_hard";
 export type SubmissionVerdict = "accepted" | "wrong_answer" | "time_limit_exceeded" | "memory_limit_exceeded" | "runtime_error" | "compilation_error" | "internal_error" | "pending";
 export type ContestStatus = "draft" | "scheduled" | "active" | "ended" | "cancelled";
 export type ContestType = "psg_wide" | "institution" | "department" | "batch" | "club" | "weekly" | "monthly" | "placement" | "hackathon" | "special";
@@ -152,6 +152,7 @@ export interface Problem {
   title: string;
   slug: string;
   difficulty: Difficulty;
+  topic?: string;
   description: string;
   constraints: string | null;
   input_format: string | null;
@@ -160,6 +161,8 @@ export interface Problem {
   hints: string[];
   editorial: string | null;
   starter_code: Record<string, string>;
+  diagram?: string | null;
+  solution_code?: Record<string, string>;
   submission_count: number;
   accepted_count: number;
   acceptance_rate: number;

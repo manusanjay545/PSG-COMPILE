@@ -70,7 +70,7 @@ function ActivityPanel({ activity, recent }: { activity: ActivityDay[]; recent: 
   const best = Math.max(...activity.map((day) => day.count), 0);
   const currentStreak = useMemo(() => {
     const active = new Set(activity.filter((day) => day.count > 0).map((day) => day.date));
-    let cursor = new Date();
+    const cursor = new Date();
     if (!active.has(localDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
     let streak = 0;
     while (active.has(localDateKey(cursor))) { streak += 1; cursor.setDate(cursor.getDate() - 1); }
@@ -119,16 +119,19 @@ export function CompilerWorkspace() {
   const language = languages.find((item) => item.id === languageId);
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || "[]") as ActivityDay[];
-      const normalized = Array.from({ length: 84 }, (_, index) => {
-        const date = new Date(); date.setHours(0, 0, 0, 0); date.setDate(date.getDate() - (83 - index));
-        const key = localDateKey(date);
-        return { date: key, count: stored.find((item) => item.date === key)?.count || 0 };
-      });
-      setActivity(normalized);
-      setRecent(JSON.parse(localStorage.getItem(RECENT_KEY) || "[]") as RunRecord[]);
-    } catch { setActivity([]); setRecent([]); }
+    const timer = window.setTimeout(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || "[]") as ActivityDay[];
+        const normalized = Array.from({ length: 84 }, (_, index) => {
+          const date = new Date(); date.setHours(0, 0, 0, 0); date.setDate(date.getDate() - (83 - index));
+          const key = localDateKey(date);
+          return { date: key, count: stored.find((item) => item.date === key)?.count || 0 };
+        });
+        setActivity(normalized);
+        setRecent(JSON.parse(localStorage.getItem(RECENT_KEY) || "[]") as RunRecord[]);
+      } catch { setActivity([]); setRecent([]); }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

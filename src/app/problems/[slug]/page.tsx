@@ -44,6 +44,7 @@ import {
   MOCK_CURRENT_USER,
 } from "@/lib/data/mock-data";
 import { ExecutionResponse, TestCaseResult } from "@/lib/judge/executor";
+import type { Problem } from "@/types";
 
 // Dynamically import Monaco Editor to prevent SSR window issues
 const Editor = dynamic(() => import("@monaco-editor/react"), {
@@ -59,9 +60,28 @@ function ProblemDetailPageContent() {
   const params = useParams();
   const slug = params?.slug as string;
 
-  // Find problem or fallback to first
-  const problem =
-    MOCK_PROBLEMS.find((p) => p.slug === slug) || MOCK_PROBLEMS[0];
+  const [loadedProblem, setLoadedProblem] = React.useState<Problem | null>(
+    () => MOCK_PROBLEMS.find((item) => item.slug === slug) ?? null
+  );
+  const problem = loadedProblem ?? MOCK_PROBLEMS[0];
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/problems/${encodeURIComponent(slug)}`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Problem not found");
+        return response.json();
+      })
+      .then(({ problem: remoteProblem }) => {
+        if (!cancelled && remoteProblem) setLoadedProblem(remoteProblem as Problem);
+      })
+      .catch(() => {
+        if (!cancelled && !MOCK_PROBLEMS.some((item) => item.slug === slug)) {
+          window.location.assign("/problems");
+        }
+      });
+    return () => { cancelled = true; };
+  }, [slug]);
 
   const [activeTab, setActiveTab] = React.useState("description");
   const [selectedLanguage, setSelectedLanguage] = React.useState("python");
@@ -76,9 +96,9 @@ function ProblemDetailPageContent() {
   const [selectedTestCaseIdx, setSelectedTestCaseIdx] = React.useState(0);
   const [executionResult, setExecutionResult] = React.useState<ExecutionResponse | null>(null);
 
-  // Load persistent code from localStorage
+  // Restore saved code after hydration so server and initial browser markup match.
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
+    const timer = window.setTimeout(() => {
       const saved = localStorage.getItem(`psg_code_${problem.id}_${selectedLanguage}`);
       if (saved) {
         setCode(saved);
@@ -88,7 +108,8 @@ function ProblemDetailPageContent() {
         const langObj = MOCK_LANGUAGES.find((l) => l.slug === selectedLanguage);
         setCode(langObj?.template_code || "");
       }
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [selectedLanguage, problem.id, problem.starter_code]);
 
   // Language change handler
@@ -121,6 +142,7 @@ function ProblemDetailPageContent() {
         }),
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not run the sample cases.");
       setExecutionResult(data);
 
       if (data.verdict === "accepted") {
@@ -128,8 +150,8 @@ function ProblemDetailPageContent() {
       } else {
         toast.error(`Run finished with verdict: ${data.verdict.toUpperCase()}`);
       }
-    } catch (err: any) {
-      toast.error("Execution failed: " + err.message);
+    } catch (err: unknown) {
+      toast.error("Execution failed: " + (err instanceof Error ? err.message : "Please try again."));
     } finally {
       setIsRunning(false);
     }
@@ -150,6 +172,7 @@ function ProblemDetailPageContent() {
         }),
       });
       const data = await res.json();
+      if (!res.ok || !data.result) throw new Error(data.error || "Could not submit this solution.");
       setExecutionResult(data.result);
 
       if (data.result.verdict === "accepted") {
@@ -161,8 +184,8 @@ function ProblemDetailPageContent() {
           description: `${data.result.passedCount}/${data.result.totalCount} test cases passed.`,
         });
       }
-    } catch (err: any) {
-      toast.error("Submission failed: " + err.message);
+    } catch (err: unknown) {
+      toast.error("Submission failed: " + (err instanceof Error ? err.message : "Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -256,15 +279,17 @@ function ProblemDetailPageContent() {
                     {problem.title}
                   </h1>
                   <span
-                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
                       problem.difficulty === "easy"
                         ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                         : problem.difficulty === "medium"
                         ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                        : "bg-red-500/10 text-red-400 border border-red-500/20"
+                        : problem.difficulty === "very_hard"
+                          ? "bg-violet-500/10 text-violet-300 border border-violet-500/25"
+                          : "bg-red-500/10 text-red-400 border border-red-500/20"
                     }`}
                   >
-                    {problem.difficulty}
+                    {problem.difficulty === "very_hard" ? "Very hard" : problem.difficulty}
                   </span>
                 </div>
 
@@ -286,6 +311,28 @@ function ProblemDetailPageContent() {
               {/* Statement Markdown */}
               <div className="prose prose-invert prose-xs max-w-none text-zinc-300 leading-relaxed space-y-4">
                 <p className="whitespace-pre-line text-sm">{problem.description}</p>
+              </div>
+
+              {problem.diagram && (
+                <section className="space-y-2">
+                  <h3 className="text-xs uppercase font-bold tracking-wider text-zinc-400">Diagram</h3>
+                  <pre className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-xs leading-relaxed text-cyan-100 font-mono whitespace-pre">{problem.diagram}</pre>
+                </section>
+              )}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {problem.input_format && (
+                  <section className="space-y-2">
+                    <h3 className="text-xs uppercase font-bold tracking-wider text-zinc-400">Input format</h3>
+                    <pre className="h-full whitespace-pre-wrap rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-xs leading-relaxed text-zinc-300 font-mono">{problem.input_format}</pre>
+                  </section>
+                )}
+                {problem.output_format && (
+                  <section className="space-y-2">
+                    <h3 className="text-xs uppercase font-bold tracking-wider text-zinc-400">Output format</h3>
+                    <pre className="h-full whitespace-pre-wrap rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-xs leading-relaxed text-zinc-300 font-mono">{problem.output_format}</pre>
+                  </section>
+                )}
               </div>
 
               {/* Examples */}
@@ -370,32 +417,30 @@ function ProblemDetailPageContent() {
             {/* TAB 3: Solutions */}
             <TabsContent value="solutions" className="flex-1 overflow-y-auto p-6 space-y-4 m-0">
               <div className="space-y-2 pb-3 border-b border-zinc-800">
-                <h2 className="text-lg font-bold text-white">Community Solutions</h2>
-                <p className="text-xs text-zinc-400">Top solutions voted by the PSG community</p>
+                  <h2 className="text-lg font-bold text-white">Verified Reference Solution</h2>
+                  <p className="text-xs text-zinc-400">Python 3 implementation checked against all five problem test cases.</p>
               </div>
 
-              <div className="space-y-3">
+              {problem.solution_code?.python ? (
+                <div className="space-y-3">
                 <div className="p-4 rounded-lg bg-zinc-950 border border-zinc-800 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-xs font-semibold text-white">Python 3: Single-pass Hash Map</span>
-                      <div className="text-[10px] text-zinc-500">By @manu · PSG Tech · 42 Upvotes</div>
+                      <span className="text-xs font-semibold text-white">Python 3 · Official solution</span>
+                      <div className="text-[10px] text-zinc-500">Reference implementation</div>
                     </div>
                     <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-400">
-                      O(N) Time
+                      Verified
                     </Badge>
                   </div>
                   <pre className="p-3 bg-zinc-900 rounded text-xs font-mono text-zinc-300 overflow-x-auto">
-{`def two_sum(nums, target):
-    seen = {}
-    for i, n in enumerate(nums):
-        diff = target - n
-        if diff in seen:
-            return [seen[diff], i]
-        seen[n] = i`}
+{problem.solution_code.python}
                   </pre>
                 </div>
-              </div>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">A reference solution has not been added yet.</div>
+              )}
             </TabsContent>
 
             {/* TAB 4: Discussions */}
@@ -443,7 +488,7 @@ function ProblemDetailPageContent() {
                   <SelectValue placeholder="Language" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
-                  {MOCK_LANGUAGES.map((l) => (
+                  {MOCK_LANGUAGES.filter((language) => language.slug !== "sql").map((l) => (
                     <SelectItem key={l.slug} value={l.slug} className="text-xs">
                       {l.name}
                     </SelectItem>

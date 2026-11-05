@@ -1,62 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { executeCodeInSandbox } from "@/lib/judge/executor";
-import { MOCK_PROBLEMS } from "@/lib/data/mock-data";
+import { runTestCases } from "@/lib/judge/run-code";
+import { getProblemTestCases } from "@/lib/problems/testcases";
 
-export async function POST(req: NextRequest) {
+export const maxDuration = 30;
+
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const { problemId, language, code, customInput } = body;
+    const body = await request.json();
+    const problemId = typeof body.problemId === "string" ? body.problemId : "";
+    const language = typeof body.language === "string" ? body.language : "python";
+    const code = typeof body.code === "string" ? body.code : "";
+    const customInput = typeof body.customInput === "string" ? body.customInput : "";
+    if (!problemId || !code.trim()) return NextResponse.json({ error: "Problem and code are required." }, { status: 400 });
+    if (customInput.length > 20_000) return NextResponse.json({ error: "Custom input is limited to 20 KB." }, { status: 413 });
 
-    if (!problemId || !code) {
-      return NextResponse.json(
-        { error: "Problem ID and code are required." },
-        { status: 400 }
-      );
-    }
+    const testCases = customInput.trim()
+      ? [{ input: customInput, expected_output: "", is_sample: true }]
+      : await getProblemTestCases(problemId, false);
+    if (!testCases.length) return NextResponse.json({ error: "No sample test cases are available for this problem." }, { status: 404 });
 
-    const problem = MOCK_PROBLEMS.find(
-      (p) => p.id === problemId || p.slug === problemId
-    );
-
-    // If custom input provided, run against that
-    let testCasesToRun = [];
-    if (customInput !== undefined && customInput !== null && customInput.trim() !== "") {
-      testCasesToRun = [
-        {
-          input: customInput,
-          expected_output: "Custom run completed",
-          is_sample: true,
-        },
-      ];
-    } else if (problem && problem.examples.length > 0) {
-      testCasesToRun = problem.examples.map((ex) => ({
-        input: ex.input,
-        expected_output: ex.output,
-        is_sample: true,
-      }));
-    } else {
-      testCasesToRun = [
-        {
-          input: "4\n2 7 11 15\n9",
-          expected_output: "0 1",
-          is_sample: true,
-        },
-      ];
-    }
-
-    const result = await executeCodeInSandbox(
-      problemId,
-      language || "python",
-      code,
-      testCasesToRun
-    );
-
-    return NextResponse.json(result);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error?.message || "Execution engine failure" },
-      { status: 500 }
-    );
+    return NextResponse.json(await runTestCases(language, code, testCases, !customInput.trim()));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Compiler execution failed.";
+    return NextResponse.json({ error: message }, { status: 502 });
   }
 }
-

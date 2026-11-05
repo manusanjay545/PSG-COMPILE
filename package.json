@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "problems:generate": "node scripts/generate-problem-bank.mjs",
+    "problems:verify": "node scripts/verify-problem-bank.mjs",
+    "problems:seed": "node scripts/seed-problem-bank.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
