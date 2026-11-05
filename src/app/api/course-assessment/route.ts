@@ -21,6 +21,15 @@ export async function GET(request: NextRequest) {
   const unlockedChapter = nextChapter === -1 ? assessment.course.modules.length - 1 : nextChapter;
   if (chapterIndex > unlockedChapter) return NextResponse.json({ error: "Complete the previous chapter test first." }, { status: 403 });
 
+  const reveal = request.nextUrl.searchParams.get("reveal");
+  if (reveal === "mcq") {
+    const questionIndex = Number(request.nextUrl.searchParams.get("question"));
+    const question = assessment.questions[questionIndex];
+    if (!Number.isInteger(questionIndex) || !question) return NextResponse.json({ error: "Choose a valid question." }, { status: 400 });
+    return NextResponse.json({ answer: question.answer, correctAnswer: question.options[question.answer], explanation: question.explanation });
+  }
+  if (reveal === "code") return NextResponse.json({ solution: assessment.solution });
+
   return NextResponse.json({
     questions: assessment.questions.map(({ question, options }) => ({ question, options })),
     codingTest: { prompt: assessment.codingTest.prompt, inputFormat: assessment.codingTest.inputFormat, outputFormat: assessment.codingTest.outputFormat, starterCode: assessment.codingTest.starterCode },

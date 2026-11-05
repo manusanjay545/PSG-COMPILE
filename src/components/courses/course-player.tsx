@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Award, Check, CheckCircle2, ClipboardCheck, Download, ExternalLink, LoaderCircle, LockKeyhole, PartyPopper, Share2 } from "lucide-react";
+import { ArrowLeft, Award, Check, CheckCircle2, ClipboardCheck, Code2, Download, ExternalLink, Lightbulb, LoaderCircle, LockKeyhole, PartyPopper, Share2 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import { COURSES } from "@/lib/courses/catalog";
 
 type Question = { question: string; options: string[] };
 type Assessment = { questions: Question[]; codingTest: { prompt: string; inputFormat: string; outputFormat: string; starterCode: string } };
+type RevealedAnswer = { answer: number; correctAnswer: string; explanation: string };
 type Certificate = { course_slug: string; course_title: string; certificate_code: string; learner_name: string; roll_number: string | null; college_name: string | null; department_name: string | null; academic_year: string | null; issued_at: string };
 
 function certificateText(certificate: Certificate) {
@@ -53,6 +54,9 @@ export function CoursePlayer({ slug }: { slug: string }) {
   const [chapter, setChapter] = React.useState(0);
   const [assessment, setAssessment] = React.useState<Assessment | null>(null);
   const [answers, setAnswers] = React.useState<number[]>([]);
+  const [revealedAnswers, setRevealedAnswers] = React.useState<Record<number, RevealedAnswer>>({});
+  const [codeSolution, setCodeSolution] = React.useState<string | null>(null);
+  const [revealing, setRevealing] = React.useState("");
   const [code, setCode] = React.useState("");
   const [certificate, setCertificate] = React.useState<Certificate | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -99,7 +103,30 @@ export function CoursePlayer({ slug }: { slug: string }) {
   const courseComplete = completed.length === course.modules.length;
   const assessmentPending = isSignedIn && !assessment && !error && !completed.includes(chapter);
   const onAnswer = (question: number, option: number) => setAnswers((current) => { const next = [...current]; next[question] = option; return next; });
-  const selectChapter = (index: number) => { setChapter(index); setAssessment(null); setAnswers([]); setError(""); setNotice(""); };
+  const selectChapter = (index: number) => { setChapter(index); setAssessment(null); setAnswers([]); setRevealedAnswers({}); setCodeSolution(null); setError(""); setNotice(""); };
+
+  const revealMcq = async (questionIndex: number) => {
+    const key = `mcq-${questionIndex}`;
+    setRevealing(key); setError("");
+    try {
+      const response = await fetch(`/api/course-assessment?course=${encodeURIComponent(slug)}&chapter=${chapter}&reveal=mcq&question=${questionIndex}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not show the answer.");
+      setRevealedAnswers((current) => ({ ...current, [questionIndex]: data }));
+    } catch (revealError) { setError(revealError instanceof Error ? revealError.message : "Could not show the answer."); }
+    finally { setRevealing(""); }
+  };
+
+  const revealCodingSolution = async () => {
+    setRevealing("code"); setError("");
+    try {
+      const response = await fetch(`/api/course-assessment?course=${encodeURIComponent(slug)}&chapter=${chapter}&reveal=code`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not show the coding solution.");
+      setCodeSolution(data.solution);
+    } catch (revealError) { setError(revealError instanceof Error ? revealError.message : "Could not show the coding solution."); }
+    finally { setRevealing(""); }
+  };
 
   const submitTest = async () => {
     setSubmitting(true); setError(""); setNotice("");
@@ -115,7 +142,7 @@ export function CoursePlayer({ slug }: { slug: string }) {
       }
       setCompleted(data.completedChapters ?? [...completed, chapter]);
       if (data.certificate) { setCertificate(data.certificate); setShowCertificate(true); }
-      else { setNotice("Chapter passed! The next chapter is now unlocked."); setAssessment(null); setAnswers([]); setChapter((value) => Math.min(value + 1, course.modules.length - 1)); }
+      else { setNotice("Chapter passed! The next chapter is now unlocked."); setAssessment(null); setAnswers([]); setRevealedAnswers({}); setCodeSolution(null); setChapter((value) => Math.min(value + 1, course.modules.length - 1)); }
     } catch (submitError) { setError(submitError instanceof Error ? submitError.message : "Could not submit your chapter test."); }
     finally { setSubmitting(false); }
   };
@@ -171,8 +198,8 @@ export function CoursePlayer({ slug }: { slug: string }) {
                 <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/50 p-5 sm:p-7">
                   <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-500/15 text-indigo-200"><ClipboardCheck className="h-4 w-4" /></span><div><p className="text-xs font-bold uppercase tracking-widest text-indigo-300">Chapter checkpoint</p><h2 className="text-xl font-bold text-white">Pass the test to unlock the next chapter</h2></div></div>
                   {assessmentPending ? <div className="mt-6"><LoadingIndicator label="Preparing your chapter test…" /></div> : completed.includes(chapter) ? <p className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-500/[0.06] p-4 text-sm text-emerald-200"><CheckCircle2 className="h-5 w-5" />This chapter is passed. Select the next unlocked chapter to continue.</p> : error && !assessment ? <div role="alert" className="mt-5 rounded-xl border border-rose-400/15 bg-rose-500/[0.06] p-4"><p className="text-sm text-rose-200">{error}</p><Button type="button" variant="outline" onClick={() => { setError(""); setAssessmentRetry((value) => value + 1); }} className="mt-3 border-white/15 text-zinc-100">Retry loading test</Button></div> : assessment && <>
-                    <div className="mt-6 space-y-5">{assessment.questions.map((question, questionIndex) => <fieldset key={question.question} className="rounded-xl border border-white/[0.07] bg-zinc-950/50 p-4"><legend className="max-w-full px-1 text-sm font-semibold leading-6 text-white"><span className="mr-2 text-indigo-300">{questionIndex + 1}.</span>{question.question}</legend><div className="mt-3 grid gap-2 sm:grid-cols-2">{question.options.map((option, optionIndex) => <label key={option} className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-xs leading-5 transition ${answers[questionIndex] === optionIndex ? "border-indigo-400/40 bg-indigo-500/10 text-indigo-100" : "border-white/[0.06] text-zinc-400 hover:border-white/15"}`}><input type="radio" name={`question-${questionIndex}`} className="mt-1 accent-indigo-400" checked={answers[questionIndex] === optionIndex} onChange={() => onAnswer(questionIndex, optionIndex)} /><span>{option}</span></label>)}</div></fieldset>)}</div>
-                    <div className="mt-6 rounded-xl border border-white/[0.08] bg-[#0d0f12] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-bold text-white">Coding test</h3><p className="mt-1 text-sm text-zinc-300">{assessment.codingTest.prompt}</p></div><Badge variant="outline" className="border-white/10 text-zinc-400">{course.title}</Badge></div><div className="mt-3 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2"><p><strong className="text-zinc-300">Input:</strong> {assessment.codingTest.inputFormat}</p><p><strong className="text-zinc-300">Output:</strong> {assessment.codingTest.outputFormat}</p></div><Textarea aria-label="Your coding test solution" value={code} onChange={(event) => setCode(event.target.value)} spellCheck={false} className="mt-4 min-h-64 resize-y border-white/[0.08] bg-black/40 font-mono text-xs leading-5 text-emerald-100" />
+                    <div className="mt-6 space-y-5">{assessment.questions.map((question, questionIndex) => { const revealed = revealedAnswers[questionIndex]; return <fieldset key={question.question} className="rounded-xl border border-white/[0.07] bg-zinc-950/50 p-4"><legend className="max-w-full px-1 text-sm font-semibold leading-6 text-white"><span className="mr-2 text-indigo-300">{questionIndex + 1}.</span>{question.question}</legend><div className="mt-3 grid gap-2 sm:grid-cols-2">{question.options.map((option, optionIndex) => <label key={option} className={`flex cursor-pointer items-start gap-2 rounded-lg border p-3 text-xs leading-5 transition ${revealed?.answer === optionIndex ? "border-emerald-400/35 bg-emerald-500/[0.08] text-emerald-100" : answers[questionIndex] === optionIndex ? "border-indigo-400/40 bg-indigo-500/10 text-indigo-100" : "border-white/[0.06] text-zinc-400 hover:border-white/15"}`}><input type="radio" name={`question-${questionIndex}`} className="mt-1 accent-indigo-400" checked={answers[questionIndex] === optionIndex} onChange={() => onAnswer(questionIndex, optionIndex)} /><span>{option}</span></label>)}</div><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><Button type="button" size="sm" variant="outline" onClick={() => void revealMcq(questionIndex)} disabled={revealing === `mcq-${questionIndex}`} className="border-indigo-300/20 text-indigo-200 hover:bg-indigo-500/10">{revealed ? <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> : <Lightbulb className="mr-1.5 h-3.5 w-3.5" />}{revealed ? "Answer shown" : revealing === `mcq-${questionIndex}` ? "Loading answer…" : "Show correct answer"}</Button>{revealed && <p className="text-xs leading-5 text-emerald-200">{revealed.explanation}</p>}</div></fieldset>; })}</div>
+                    <div className="mt-6 rounded-xl border border-white/[0.08] bg-[#0d0f12] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-bold text-white">Coding test</h3><p className="mt-1 text-sm text-zinc-300">{assessment.codingTest.prompt}</p></div><div className="flex flex-wrap items-center gap-2"><Badge variant="outline" className="border-white/10 text-zinc-400">{course.title}</Badge><Button type="button" size="sm" variant="outline" onClick={() => void revealCodingSolution()} disabled={revealing === "code"} className="border-indigo-300/20 text-indigo-200 hover:bg-indigo-500/10">{codeSolution ? <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> : <Code2 className="mr-1.5 h-3.5 w-3.5" />}{codeSolution ? "Solution shown" : revealing === "code" ? "Loading solution…" : "Show code solution"}</Button></div></div><div className="mt-3 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2"><p><strong className="text-zinc-300">Input:</strong> {assessment.codingTest.inputFormat}</p><p><strong className="text-zinc-300">Output:</strong> {assessment.codingTest.outputFormat}</p></div>{codeSolution && <div className="mt-4 overflow-hidden rounded-lg border border-emerald-300/15 bg-emerald-500/[0.04]"><p className="border-b border-emerald-300/10 px-3 py-2 text-xs font-semibold text-emerald-200">Reference solution · {course.title}</p><pre className="max-h-80 overflow-auto p-4 text-xs leading-5 text-emerald-100"><code>{codeSolution}</code></pre></div>}<Textarea aria-label="Your coding test solution" value={code} onChange={(event) => setCode(event.target.value)} spellCheck={false} className="mt-4 min-h-64 resize-y border-white/[0.08] bg-black/40 font-mono text-xs leading-5 text-emerald-100" />
                       {error && <p role="alert" className="mt-3 rounded-lg border border-rose-400/15 bg-rose-500/[0.06] p-3 text-sm text-rose-200">{error}</p>}{notice && <p role="status" className="mt-3 rounded-lg border border-emerald-400/15 bg-emerald-500/[0.06] p-3 text-sm text-emerald-200">{notice}</p>}
                       <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-zinc-500">Answer all five questions and pass every hidden code check.</p><Button type="button" onClick={submitTest} disabled={submitting || assessmentPending || Array.from({ length: 5 }, (_, index) => answers[index]).some((answer) => !Number.isInteger(answer))} className="bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50">{submitting ? <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" />Checking your test…</> : <><CheckCircle2 className="mr-2 h-4 w-4" />Submit chapter test</>}</Button></div>
                     </div>
