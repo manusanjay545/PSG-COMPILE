@@ -7,6 +7,7 @@ import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, LoaderCircle
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { CompilerAd } from "@/components/compiler/compiler-ad";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false, loading: () => <div role="status" className="flex h-[390px] items-center justify-center gap-2 bg-[#101216] text-sm text-zinc-400"><LoaderCircle className="h-4 w-4 animate-spin text-indigo-400" />Loading editor…</div> });
 
@@ -110,6 +111,7 @@ export function CompilerWorkspace() {
   const [code, setCode] = useState("print(\"Hello, world!\")\n");
   const [stdin, setStdin] = useState("");
   const [result, setResult] = useState<RunResult | null>(null);
+  const [hasRun, setHasRun] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loadingLanguages, setLoadingLanguages] = useState(true);
   const [languageError, setLanguageError] = useState("");
@@ -166,7 +168,7 @@ export function CompilerWorkspace() {
 
   const run = useCallback(async () => {
     if (!language) return;
-    setBusy(true); setResult(null); setActivePane("output");
+    setHasRun(true); setBusy(true); setResult(null); setActivePane("output");
     try {
       const response = await fetch("/api/compile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ languageId, code, stdin }) });
       const payload = await response.json() as RunResult;
@@ -206,20 +208,21 @@ export function CompilerWorkspace() {
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500"><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Zap className="h-3.5 w-3.5 text-amber-300" />Fast isolated runtime</span><span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-2"><Check className="h-3.5 w-3.5 text-emerald-300" />No setup needed</span></div>
       </div>
 
-      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.76fr)]">
+      <div className={`grid min-w-0 gap-4 ${hasRun ? "xl:grid-cols-[160px_minmax(0,1fr)_minmax(320px,0.76fr)]" : "xl:grid-cols-[160px_minmax(0,1fr)]"}`}>
+        <CompilerAd />
         <section className="min-w-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101216] shadow-2xl shadow-black/25">
           <div className="flex min-h-[58px] flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] bg-[#14161a] px-3 py-2.5 sm:px-4">
             <div className="flex min-w-0 items-center gap-2">
               <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-indigo-300/10 bg-indigo-400/[0.08] text-indigo-200"><Code2 className="h-4 w-4" /></div>
               <div className="relative min-w-0">
-                <select aria-label="Programming language" value={languageId || ""} disabled={loadingLanguages || !languages.length} onChange={(event) => { const next = languages.find((item) => item.id === Number(event.target.value)); if (next) { setLanguageId(next.id); setCode(starterCode(next.name)); setResult(null); } }} className="h-9 max-w-[min(65vw,340px)] appearance-none rounded-lg border border-white/[0.08] bg-[#1a1c21] py-1 pl-3 pr-9 text-xs font-medium text-zinc-200 outline-none transition focus:border-indigo-400/40 disabled:opacity-60">
+              <select aria-label="Programming language" value={languageId || ""} disabled={loadingLanguages || !languages.length} onChange={(event) => { const next = languages.find((item) => item.id === Number(event.target.value)); if (next) { setLanguageId(next.id); setCode(starterCode(next.name)); setResult(null); setHasRun(false); } }} className="h-9 max-w-[min(65vw,340px)] appearance-none rounded-lg border border-white/[0.08] bg-[#1a1c21] py-1 pl-3 pr-9 text-xs font-medium text-zinc-200 outline-none transition focus:border-indigo-400/40 disabled:opacity-60">
                   {loadingLanguages ? <option value="">Loading languages…</option> : languages.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select><ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
               </div>
               <span className="hidden rounded-md border border-white/[0.06] px-2 py-1 font-mono text-[10px] text-zinc-600 sm:inline">main</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="sm" onClick={() => { setCode(starterCode(selectedLanguage)); setResult(null); }} className="h-9 gap-1.5 px-2.5 text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-white"><RotateCcw className="h-3.5 w-3.5" /><span className="hidden sm:inline">Reset</span></Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => { setCode(starterCode(selectedLanguage)); setResult(null); setHasRun(false); }} className="h-9 gap-1.5 px-2.5 text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-white"><RotateCcw className="h-3.5 w-3.5" /><span className="hidden sm:inline">Reset</span></Button>
               <Button type="button" onClick={run} disabled={busy || loadingLanguages || !language} className="h-9 min-w-[98px] gap-2 rounded-lg bg-emerald-400 px-4 text-xs font-semibold text-[#092113] shadow-lg shadow-emerald-400/10 hover:bg-emerald-300 disabled:bg-zinc-700 disabled:text-zinc-400">{busy ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-900/20 border-t-zinc-900" /> : <Play className="h-3.5 w-3.5 fill-current" />}{busy ? "Running" : "Run code"}<kbd className="hidden rounded border border-emerald-950/20 px-1 py-0.5 text-[9px] sm:inline">⌘↵</kbd></Button>
             </div>
           </div>
@@ -227,10 +230,11 @@ export function CompilerWorkspace() {
           <div className="overflow-hidden bg-[#101216]">
             <Editor height="min(58vh, 620px)" language={editorLanguage(selectedLanguage)} value={code} onChange={(value) => setCode(value || "")} theme="vs-dark" options={{ minimap: { enabled: false }, fontSize: 14, lineHeight: 23, padding: { top: 18, bottom: 18 }, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: "on", automaticLayout: true, tabSize: 4, renderLineHighlight: "gutter", fontFamily: "'SF Mono', 'Cascadia Code', Consolas, monospace", fontLigatures: true, scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 } }} />
           </div>
+          {!hasRun && <div className="border-t border-white/[0.05] p-3 sm:p-4"><label htmlFor="initial-stdin" className="mb-2 block text-xs font-medium text-zinc-400">Standard input <span className="font-normal text-zinc-600">(optional)</span></label><textarea id="initial-stdin" aria-label="Standard input before first run" value={stdin} onChange={(event) => setStdin(event.target.value)} placeholder="Enter input for your program, if needed…" rows={3} className="w-full resize-y rounded-lg border border-white/[0.06] bg-[#0c0e11] p-3 font-mono text-xs leading-5 text-zinc-300 outline-none placeholder:text-zinc-700 focus:border-indigo-300/30" /></div>}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.05] px-3 py-2.5 text-[10px] text-zinc-600 sm:px-4"><span>Runs in a secure, isolated environment</span><span>Code is limited to 50 KB</span></div>
         </section>
 
-        <section className="flex min-h-[380px] min-w-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101216] shadow-2xl shadow-black/25 xl:min-h-[620px]">
+        {hasRun && <section className="flex min-h-[380px] min-w-0 flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#101216] shadow-2xl shadow-black/25 xl:min-h-[620px]">
           <div className="flex min-h-[58px] items-center justify-between border-b border-white/[0.06] bg-[#14161a] px-3 sm:px-4">
             <div className="flex items-center gap-2 text-sm font-medium text-zinc-200"><Terminal className="h-4 w-4 text-emerald-300" />Run panel</div>
             <div className="flex items-center gap-1">
@@ -242,7 +246,7 @@ export function CompilerWorkspace() {
             {result ? <><div className="mb-3 flex flex-wrap items-center justify-between gap-2"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${errorText ? "bg-rose-400/10 text-rose-300" : "bg-emerald-400/10 text-emerald-300"}`}><span className={`h-1.5 w-1.5 rounded-full ${errorText ? "bg-rose-300" : "bg-emerald-300"}`} />{result.status || (errorText ? "Error" : "Finished")}</span><span className="flex gap-3 text-[10px] text-zinc-600">{result.runtime && <span>Time {result.runtime}</span>}{result.memory && <span>Memory {result.memory}</span>}</span></div><pre className="max-h-[min(52vh,620px)] overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-5 text-zinc-300">{outputText || (errorText ? <span className="text-rose-300">{errorText}</span> : <span className="text-zinc-600">Program finished with no output.</span>)}</pre>{outputText && errorText && <pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-5 text-rose-300">{errorText}</pre>}</> : <div className="grid min-h-[280px] place-items-center text-center text-xs text-zinc-600">{busy ? <span className="inline-flex items-center gap-2"><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-400/20 border-t-indigo-300" />Preparing a secure run…</span> : "Run your code to see the output here."}</div>}
           </div>}
           <div className="border-t border-white/[0.05] px-3 py-2.5 text-[10px] text-zinc-600 sm:px-4">Runs in a secure, isolated environment</div>
-        </section>
+        </section>}
       </div>
 
       <div className="mt-4"><ActivityPanel activity={activity} recent={recent} /></div>
