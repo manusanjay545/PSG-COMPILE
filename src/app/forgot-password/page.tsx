@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, MailCheck } from "lucide-react";
+import { ArrowLeft, LoaderCircle, MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={submit} className="space-y-4">
               <div className="space-y-1.5"><Label htmlFor="email" className="text-zinc-300">Email</Label><Input id="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@gmail.com" className="border-zinc-800 bg-zinc-950" /></div>
               {error && <p role="alert" className="rounded-md border border-red-900 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
-              <Button type="submit" disabled={busy} className="w-full bg-indigo-600 text-white hover:bg-indigo-700">{busy ? "Sending…" : "Send reset link"}</Button>
+              <Button type="submit" disabled={busy} className="w-full bg-indigo-600 text-white hover:bg-indigo-700">{busy && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}{busy ? "Sending…" : "Send reset link"}</Button>
               <Button asChild type="button" variant="ghost" className="w-full text-zinc-400"><Link href="/login"><ArrowLeft className="mr-2 h-4 w-4" />Back to sign in</Link></Button>
             </form>
           )}

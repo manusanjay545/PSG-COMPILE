@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Code2,
+  LoaderCircle,
   Play,
   Send,
   RotateCcw,
@@ -50,7 +51,8 @@ import type { Problem } from "@/types";
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="h-full w-full flex items-center justify-center bg-zinc-950 text-zinc-500 font-mono text-xs">
+    <div role="status" className="h-full w-full flex items-center justify-center gap-2 bg-zinc-950 text-zinc-400 font-mono text-xs">
+      <LoaderCircle className="h-4 w-4 animate-spin text-indigo-400" />
       Loading Monaco Code Engine...
     </div>
   ),
@@ -528,7 +530,7 @@ function ProblemDetailPageContent() {
                 disabled={isRunning || isSubmitting}
                 className="h-8 text-xs border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700 hover:text-white gap-1.5"
               >
-                <Play className="h-3.5 w-3.5 text-zinc-400" />
+                {isRunning ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : <Play className="h-3.5 w-3.5 text-zinc-400" />}
                 {isRunning ? "Running..." : "Run"}
               </Button>
               <Button
@@ -537,7 +539,7 @@ function ProblemDetailPageContent() {
                 disabled={isRunning || isSubmitting}
                 className="h-8 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold gap-1.5 shadow-sm shadow-indigo-600/30"
               >
-                <Send className="h-3.5 w-3.5" />
+                {isSubmitting ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : <Send className="h-3.5 w-3.5" />}
                 {isSubmitting ? "Judging..." : "Submit"}
               </Button>
             </div>
@@ -724,7 +726,7 @@ function ProblemDetailPageContent() {
 
 export default function ProblemDetailPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center text-xs text-zinc-500">Loading Problem Workspace...</div>}>
+    <React.Suspense fallback={<div role="status" className="min-h-screen bg-zinc-950 flex items-center justify-center gap-2 text-sm text-zinc-400"><LoaderCircle className="h-4 w-4 animate-spin text-indigo-400" />Loading Problem Workspace…</div>}>
       <ProblemDetailPageContent />
     </React.Suspense>
   );

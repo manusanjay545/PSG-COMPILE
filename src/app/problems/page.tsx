@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoadingIndicator } from "@/components/ui/loading-state";
 
 type ArchiveProblem = {
   id: string;
@@ -134,7 +135,7 @@ export default function ProblemsPage() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-500">
-          <span>{isLoading ? "Loading problems…" : `Showing ${archive.total === 0 ? 0 : (page - 1) * 50 + 1}–${Math.min(page * 50, archive.total)} of ${archive.total.toLocaleString()}`}</span>
+          {isLoading ? <LoadingIndicator label="Loading problems…" className="text-xs" /> : <span>{`Showing ${archive.total === 0 ? 0 : (page - 1) * 50 + 1}–${Math.min(page * 50, archive.total)} of ${archive.total.toLocaleString()}`}</span>}
           <span>2 sample cases + 3 hidden checks per problem</span>
         </div>
 
@@ -171,7 +172,7 @@ export default function ProblemsPage() {
                   <tr><td colSpan={5} className="p-12 text-center text-zinc-400"><Code2 className="h-8 w-8 mx-auto mb-2 text-zinc-600" />No problems match those filters.</td></tr>
                 )}
                 {isLoading && archive.data.length === 0 && (
-                  <tr><td colSpan={5} className="p-12 text-center text-zinc-400">Loading verified problems…</td></tr>
+                  <tr><td colSpan={5} className="p-12 text-center"><LoadingIndicator label="Loading verified problems…" /></td></tr>
                 )}
                 {loadError && <tr><td colSpan={5} className="p-12 text-center text-rose-300">{loadError}</td></tr>}
               </tbody>

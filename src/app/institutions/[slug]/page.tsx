@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   Building2,
+  LoaderCircle,
   Users,
   Trophy,
   BookOpen,
@@ -166,7 +167,7 @@ function InstitutionDetailPageContent() {
 
 export default function InstitutionDetailPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center text-xs text-zinc-500">Loading Campus Standings...</div>}>
+    <React.Suspense fallback={<div role="status" className="min-h-screen bg-zinc-950 flex items-center justify-center gap-2 text-sm text-zinc-400"><LoaderCircle className="h-4 w-4 animate-spin text-indigo-400" />Loading Campus Standings…</div>}>
       <InstitutionDetailPageContent />
     </React.Suspense>
   );

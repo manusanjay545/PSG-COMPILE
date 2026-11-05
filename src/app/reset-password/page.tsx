@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { LoaderCircle } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,7 +70,7 @@ export default function ResetPasswordPage() {
               <div className="space-y-1.5"><Label htmlFor="password" className="text-zinc-300">New password</Label><Input id="password" type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} className="border-zinc-800 bg-zinc-950" /></div>
               <div className="space-y-1.5"><Label htmlFor="confirm-password" className="text-zinc-300">Confirm new password</Label><Input id="confirm-password" type="password" autoComplete="new-password" minLength={8} required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="border-zinc-800 bg-zinc-950" /></div>
               {error && <p role="alert" className="rounded-md border border-red-900 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
-              <Button type="submit" disabled={busy} className="w-full bg-indigo-600 text-white hover:bg-indigo-700">{busy ? "Saving…" : "Update password"}</Button>
+              <Button type="submit" disabled={busy} className="w-full bg-indigo-600 text-white hover:bg-indigo-700">{busy && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}{busy ? "Saving…" : "Update password"}</Button>
             </form>
           ) : (
             <div className="space-y-4 text-center">

@@ -3,12 +3,12 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, Play, RotateCcw, Terminal, Trophy, Zap } from "lucide-react";
+import { Activity, ArrowUpRight, Check, ChevronDown, Clock3, Code2, LoaderCircle, Play, RotateCcw, Terminal, Trophy, Zap } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 
-const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false, loading: () => <div className="grid h-[390px] place-items-center bg-[#101216] text-sm text-zinc-500">Loading editor…</div> });
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false, loading: () => <div role="status" className="flex h-[390px] items-center justify-center gap-2 bg-[#101216] text-sm text-zinc-400"><LoaderCircle className="h-4 w-4 animate-spin text-indigo-400" />Loading editor…</div> });
 
 type Language = { id: number; name: string };
 type ActivityDay = { date: string; count: number };

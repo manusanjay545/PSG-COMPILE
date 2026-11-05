@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { LoaderCircle, Save } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { AvatarPicker } from "@/components/profile/avatar-picker";
+import { LoadingIndicator } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -111,7 +112,7 @@ export default function SettingsPage() {
           <p className="text-sm text-zinc-400">Update the information shown on your PSGCompile profile.</p>
         </div>
 
-        {loading ? <p className="text-sm text-zinc-400">Loading your account…</p> : (
+        {loading ? <LoadingIndicator label="Loading your account…" className="py-6" /> : (
           <form onSubmit={save} className="space-y-6">
             <Card className="border-zinc-800 bg-zinc-900/60 shadow-xl">
               <CardHeader><CardTitle className="text-lg text-white">Student profile</CardTitle></CardHeader>
@@ -139,7 +140,7 @@ export default function SettingsPage() {
             </Card>
             {error && <p role="alert" className="rounded-md border border-red-900 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
             {notice && <p role="status" className="rounded-md border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-300">{notice}</p>}
-            <div className="flex justify-end"><Button type="submit" disabled={saving} className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700"><Save className="h-4 w-4" />{saving ? "Saving…" : "Save changes"}</Button></div>
+            <div className="flex justify-end"><Button type="submit" disabled={saving} className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700">{saving ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" />}{saving ? "Saving…" : "Save changes"}</Button></div>
           </form>
         )}
       </main>

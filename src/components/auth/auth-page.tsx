@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft, LoaderCircle, Shield } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -164,6 +164,7 @@ export function AuthPage({ mode }: AuthPageProps) {
               {error && <p role="alert" className="rounded-md border border-red-900/70 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
               {message && <p role="status" className="rounded-md border border-emerald-900/70 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-300">{message}</p>}
               <Button type="submit" disabled={isLoading} className="h-10 w-full bg-indigo-600 text-white hover:bg-indigo-700">
+                {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
                 {isLoading ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
               </Button>
             </form>

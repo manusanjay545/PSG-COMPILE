@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, LoaderCircle } from "lucide-react";
 import { AvatarPicker } from "@/components/profile/avatar-picker";
+import { LoadingIndicator } from "@/components/ui/loading-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -117,7 +118,7 @@ export default function OnboardingPage() {
               <CardDescription className="text-zinc-400">You can update these later in settings.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              {loading ? <p className="text-sm text-zinc-400">Loading your account…</p> : <>
+              {loading ? <LoadingIndicator label="Loading your account…" className="py-6" /> : <>
                 <AvatarPicker value={profile.avatar_url} source={profile.avatar_source} userId={userId} allowUpload onChange={(url, source) => setProfile((current) => ({ ...current, avatar_url: url, avatar_source: source }))} />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="full_name" label="Full name"><Input id="full_name" required maxLength={100} value={profile.full_name} onChange={(event) => setField("full_name", event.target.value)} className="border-zinc-800 bg-zinc-950" /></Field>
@@ -132,7 +133,7 @@ export default function OnboardingPage() {
               {error && <p role="alert" className="rounded-md border border-red-900 bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
             </CardContent>
             <CardFooter className="flex justify-end border-t border-zinc-800 pt-4">
-              <Button type="submit" disabled={loading || saving} className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700">{saving ? "Saving…" : "Save and continue"}<ArrowRight className="h-4 w-4" /></Button>
+              <Button type="submit" disabled={loading || saving} className="gap-2 bg-indigo-600 text-white hover:bg-indigo-700">{saving ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}{saving ? "Saving…" : "Save and continue"}{!saving && <ArrowRight className="h-4 w-4" />}</Button>
             </CardFooter>
           </form>
         </Card>
