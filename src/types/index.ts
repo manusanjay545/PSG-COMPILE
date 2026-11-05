@@ -93,7 +93,12 @@ export interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
+  avatar_source: "google" | "preset" | "upload" | null;
   bio: string | null;
+  college_name: string | null;
+  department_name: string | null;
+  academic_year: string | null;
+  class_name: string | null;
   institution_id: string | null;
   department_id: string | null;
   program_id: string | null;
@@ -512,4 +517,5 @@ export interface PaginatedResponse<T> {
   per_page: number;
   total_pages: number;
 }
+
 

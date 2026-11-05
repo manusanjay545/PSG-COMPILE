@@ -108,7 +108,12 @@ CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   full_name TEXT,
   avatar_url TEXT,
+  avatar_source TEXT DEFAULT 'preset' CHECK (avatar_source IN ('google', 'preset', 'upload')),
   bio TEXT,
+  college_name TEXT,
+  department_name TEXT,
+  academic_year TEXT,
+  class_name TEXT,
   institution_id UUID REFERENCES institutions(id),
   department_id UUID REFERENCES departments(id),
   program_id UUID REFERENCES programs(id),
@@ -716,4 +721,262 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER on_problem_solved
 AFTER INSERT OR UPDATE ON user_problem_status
 FOR EACH ROW EXECUTE FUNCTION handle_problem_solved();
+
+
+
+-- ============================================================
+-- SUPABASE ROW LEVEL SECURITY (RLS) & POLICIES
+-- ============================================================
+
+-- Enable RLS on all tables
+ALTER TABLE institutions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE programs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE batches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE languages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE problems ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE problem_tags ENABLE ROW LEVEL SECURITY;
+ALTER TABLE test_cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE submission_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contest_problems ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contest_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rating_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE badges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_badges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE discussions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE discussion_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE solutions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE playlists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE playlist_problems ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_activity ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_problem_status ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE allowed_domains ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coder_of_month ENABLE ROW LEVEL SECURITY;
+
+-- 1. Public Read Policies for Catalog & Educational Metadata
+CREATE POLICY "Public read institutions" ON institutions FOR SELECT USING (true);
+CREATE POLICY "Public read departments" ON departments FOR SELECT USING (true);
+CREATE POLICY "Public read programs" ON programs FOR SELECT USING (true);
+CREATE POLICY "Public read batches" ON batches FOR SELECT USING (true);
+CREATE POLICY "Public read sections" ON sections FOR SELECT USING (true);
+CREATE POLICY "Public read languages" ON languages FOR SELECT USING (true);
+CREATE POLICY "Public read tags" ON tags FOR SELECT USING (true);
+CREATE POLICY "Public read problem_tags" ON problem_tags FOR SELECT USING (true);
+CREATE POLICY "Public read badges" ON badges FOR SELECT USING (true);
+CREATE POLICY "Public read coder_of_month" ON coder_of_month FOR SELECT USING (true);
+CREATE POLICY "Public read allowed_domains" ON allowed_domains FOR SELECT USING (true);
+
+-- 2. Problem Visibility
+CREATE POLICY "Read published problems" ON problems FOR SELECT USING (is_published = true OR auth.role() = 'service_role');
+CREATE POLICY "Read sample test cases only" ON test_cases FOR SELECT USING (is_sample = true OR auth.role() = 'service_role');
+
+-- 3. Profiles & Users
+CREATE POLICY "Public read profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Public profile pictures and private per-user upload paths.
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('avatars', 'avatars', true, 2097152, ARRAY['image/jpeg', 'image/png', 'image/webp'])
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+CREATE POLICY "Public read profile avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+CREATE POLICY "Owners upload profile avatars" ON storage.objects FOR INSERT WITH CHECK (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text
+);
+CREATE POLICY "Owners update profile avatars" ON storage.objects FOR UPDATE USING (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text
+) WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "Owners delete profile avatars" ON storage.objects FOR DELETE USING (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+CREATE POLICY "Users read own user record" ON users FOR SELECT USING (auth.uid() = id OR auth.role() = 'service_role');
+CREATE POLICY "Users update own user record" ON users FOR UPDATE USING (auth.uid() = id);
+
+-- 4. Submissions & Results
+CREATE POLICY "Users read own submissions" ON submissions FOR SELECT USING (auth.uid() = user_id OR auth.role() = 'service_role');
+CREATE POLICY "Users create submissions" ON submissions FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users read own submission results" ON submission_results FOR SELECT USING (
+  EXISTS (SELECT 1 FROM submissions WHERE id = submission_results.submission_id AND user_id = auth.uid())
+  OR auth.role() = 'service_role'
+);
+
+-- 5. Contests
+CREATE POLICY "Public read public contests" ON contests FOR SELECT USING (is_public = true OR auth.role() = 'service_role');
+CREATE POLICY "Public read contest problems" ON contest_problems FOR SELECT USING (true);
+CREATE POLICY "Public read contest participants" ON contest_participants FOR SELECT USING (true);
+CREATE POLICY "Users can register for contest" ON contest_participants FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- 6. Social & Discussions
+CREATE POLICY "Public read discussions" ON discussions FOR SELECT USING (is_hidden = false);
+CREATE POLICY "Users create discussions" ON discussions FOR INSERT WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Users update own discussions" ON discussions FOR UPDATE USING (auth.uid() = author_id);
+
+CREATE POLICY "Public read comments" ON discussion_comments FOR SELECT USING (is_hidden = false);
+CREATE POLICY "Users create comments" ON discussion_comments FOR INSERT WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Users update own comments" ON discussion_comments FOR UPDATE USING (auth.uid() = author_id);
+
+CREATE POLICY "Public read solutions" ON solutions FOR SELECT USING (is_hidden = false);
+CREATE POLICY "Users create solutions" ON solutions FOR INSERT WITH CHECK (auth.uid() = author_id);
+
+CREATE POLICY "Public read votes" ON votes FOR SELECT USING (true);
+CREATE POLICY "Users manage own votes" ON votes FOR ALL USING (auth.uid() = user_id);
+
+CREATE POLICY "Public read follows" ON follows FOR SELECT USING (true);
+CREATE POLICY "Users manage follows" ON follows FOR ALL USING (auth.uid() = follower_id);
+
+-- 7. Notifications & Problem Status
+CREATE POLICY "Users read own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users update own notifications" ON notifications FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users manage own problem status" ON user_problem_status FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Public read rating history" ON rating_history FOR SELECT USING (true);
+CREATE POLICY "Public read user badges" ON user_badges FOR SELECT USING (true);
+
+-- 8. Admin Management Policies (Super Admin & Service Role)
+CREATE POLICY "Admin write institutions" ON institutions FOR ALL USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('institution_admin', 'super_admin')));
+CREATE POLICY "Admin write departments" ON departments FOR ALL USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('institution_admin', 'super_admin')));
+CREATE POLICY "Admin write problems" ON problems FOR ALL USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('problem_setter', 'super_admin')));
+CREATE POLICY "Admin write contests" ON contests FOR ALL USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('problem_setter', 'institution_admin', 'super_admin')));
+CREATE POLICY "Admin read audit_logs" ON audit_logs FOR SELECT USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'super_admin'));
+CREATE POLICY "Admin settings management" ON admin_settings FOR ALL USING (auth.role() = 'service_role' OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'super_admin'));
+
+-- ============================================================
+-- AUTOMATED USER CREATION ON GOOGLE OAUTH SIGNUP
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_username TEXT;
+  v_full_name TEXT;
+  v_avatar_url TEXT;
+  v_avatar_source TEXT;
+  v_institution_id UUID;
+  v_domain TEXT;
+BEGIN
+  -- Extract domain from user email
+  v_domain := SPLIT_PART(NEW.email, '@', 2);
+
+  -- Derive username from email prefix or generate unique fallback
+  v_username := LOWER(REGEXP_REPLACE(SPLIT_PART(COALESCE(NEW.email, ''), '@', 1), '[^a-z0-9_]+', '', 'g'));
+  IF v_username = '' THEN
+    v_username := 'student';
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.users WHERE username = v_username AND id <> NEW.id) THEN
+    v_username := v_username || '_' || SUBSTR(REPLACE(NEW.id::TEXT, '-', ''), 1, 8);
+  END IF;
+  v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', v_username);
+  v_avatar_url := COALESCE(NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture', '/avatars/avatar-01.svg');
+  v_avatar_source := CASE
+    WHEN NEW.raw_user_meta_data->>'avatar_source' IN ('google', 'preset', 'upload') THEN NEW.raw_user_meta_data->>'avatar_source'
+    WHEN v_avatar_url LIKE 'http%' OR NEW.raw_app_meta_data->>'provider' = 'google' THEN 'google'
+    ELSE 'preset'
+  END;
+
+  -- Find matching PSG institution by allowed domain
+  SELECT institution_id INTO v_institution_id FROM public.allowed_domains WHERE domain = v_domain LIMIT 1;
+  IF v_institution_id IS NULL THEN
+    -- Fallback to PSG Tech default if matching
+    SELECT id INTO v_institution_id FROM public.institutions WHERE slug = 'psg-college-of-technology' LIMIT 1;
+  END IF;
+
+  -- Insert into public.users
+  INSERT INTO public.users (id, email, username, role, is_verified)
+  VALUES (NEW.id, NEW.email, v_username, 'student', NEW.email_confirmed_at IS NOT NULL)
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    updated_at = NOW();
+
+  -- Insert into public.profiles
+  INSERT INTO public.profiles (
+    id,
+    full_name,
+    avatar_url,
+    avatar_source,
+    bio,
+    roll_number,
+    college_name,
+    department_name,
+    academic_year,
+    class_name,
+    institution_id,
+    rating,
+    peak_rating,
+    rating_tier,
+    onboarding_completed
+  )
+  VALUES (
+    NEW.id,
+    v_full_name,
+    v_avatar_url,
+    v_avatar_source,
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'bio'), ''),
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'roll_number'), ''),
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'college_name'), ''),
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'department_name'), ''),
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'academic_year'), ''),
+    NULLIF(BTRIM(NEW.raw_user_meta_data->>'class_name'), ''),
+    v_institution_id,
+    1200,
+    1200,
+    'newbie',
+    CASE
+      WHEN NEW.raw_user_meta_data->>'onboarding_completed' = 'true'
+        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'roll_number'), '') IS NOT NULL
+        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'college_name'), '') IS NOT NULL
+        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'department_name'), '') IS NOT NULL
+        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'academic_year'), '') IS NOT NULL
+        AND NULLIF(BTRIM(NEW.raw_user_meta_data->>'class_name'), '') IS NOT NULL
+      THEN true ELSE false
+    END
+  )
+  ON CONFLICT (id) DO NOTHING;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+-- Trigger on auth.users insert
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+CREATE OR REPLACE FUNCTION public.sync_user_email_verification()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE public.users
+  SET is_verified = NEW.email_confirmed_at IS NOT NULL,
+      updated_at = NOW()
+  WHERE id = NEW.id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+DROP TRIGGER IF EXISTS on_auth_user_email_confirmed ON auth.users;
+CREATE TRIGGER on_auth_user_email_confirmed
+AFTER UPDATE OF email_confirmed_at ON auth.users
+FOR EACH ROW
+WHEN (OLD.email_confirmed_at IS DISTINCT FROM NEW.email_confirmed_at)
+EXECUTE FUNCTION public.sync_user_email_verification();
+
+-- These trigger functions must not be callable through PostgREST RPC endpoints.
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.sync_user_email_verification() FROM PUBLIC, anon, authenticated;
 

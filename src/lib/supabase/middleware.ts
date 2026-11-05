@@ -7,10 +7,10 @@ export async function updateSession(request: NextRequest) {
   });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If Supabase is not configured with real credentials, allow seamless browsing
-  if (!supabaseUrl || !supabaseKey || supabaseUrl.includes("your-project")) {
+  // Auth is optional while browsing a local demo without Supabase credentials.
+  if (!supabaseUrl || !supabaseKey) {
     return supabaseResponse;
   }
 
@@ -48,3 +48,4 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse;
 }
+

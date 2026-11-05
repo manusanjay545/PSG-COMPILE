@@ -921,7 +921,12 @@ export const MOCK_CURRENT_USER: Profile = {
   id: "user-1",
   full_name: "Manu Sanjay",
   avatar_url: null,
+  avatar_source: "preset",
   bio: "Pre-final year B.Tech IT coder at PSG College of Technology. Competitive programming enthusiast and systems builder.",
+  college_name: "PSG College of Technology",
+  department_name: "Information Technology",
+  academic_year: "4th year",
+  class_name: "IT-A",
   institution_id: "inst-1",
   department_id: "dept-2",
   program_id: "prog-1",
@@ -958,3 +963,4 @@ export const MOCK_CURRENT_USER: Profile = {
   program: MOCK_PROGRAMS[0],
   batch: MOCK_BATCHES[0],
 };
+

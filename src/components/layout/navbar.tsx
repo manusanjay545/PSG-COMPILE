@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Code2,
   Trophy,
@@ -33,13 +33,63 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { SearchDialog } from "@/components/search-dialog";
 import { Logo } from "@/components/ui/logo";
-import { MOCK_CURRENT_USER } from "@/lib/data/mock-data";
+import { createClient } from "@/lib/supabase/client";
+
+type NavbarAccount = {
+  id: string;
+  email: string;
+  fullName: string;
+  avatarUrl: string | null;
+  collegeName: string | null;
+  currentStreak: number;
+};
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [account, setAccount] = React.useState<NavbarAccount | null>(null);
+
+  React.useEffect(() => {
+    let active = true;
+    const loadAccount = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase.from("profiles")
+          .select("full_name, avatar_url, college_name, current_streak")
+          .eq("id", user.id).maybeSingle();
+        if (active) setAccount({
+          id: user.id,
+          email: user.email || "",
+          fullName: profile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Student",
+          avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
+          collegeName: profile?.college_name || null,
+          currentStreak: profile?.current_streak || 0,
+        });
+      } catch {
+        // Keep the public navigation usable when Supabase is not configured.
+      }
+    };
+    void loadAccount();
+    return () => { active = false; };
+  }, []);
+
+  const signOut = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Clear the local account view even if the auth service is temporarily unreachable.
+    } finally {
+      setAccount(null);
+      router.replace("/login");
+      router.refresh();
+    }
+  };
 
   const navLinks = [
     { label: "Problems", href: "/problems", icon: Code2 },
@@ -112,10 +162,10 @@ export function Navbar() {
             </Button>
 
             {/* Streak Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+            {account && account.currentStreak > 0 && <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
               <Flame className="h-3.5 w-3.5 fill-amber-500 text-amber-500 animate-pulse" />
-              <span>{MOCK_CURRENT_USER.current_streak}d Streak</span>
-            </div>
+              <span>{account.currentStreak}d Streak</span>
+            </div>}
 
             {/* Theme Toggle */}
             <Button
@@ -181,17 +231,17 @@ export function Navbar() {
                   className="flex items-center gap-2 p-1 pl-2 pr-3 rounded-full hover:bg-zinc-900 border border-zinc-800/80"
                 >
                   <Avatar className="h-7 w-7 border border-indigo-500/40">
-                    <AvatarImage src="" />
+                    <AvatarImage src={account?.avatarUrl || ""} />
                     <AvatarFallback className="bg-indigo-600 text-[11px] font-bold text-white">
-                      MS
+                      {account?.fullName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden sm:flex flex-col text-left">
                     <span className="text-xs font-semibold text-zinc-200 leading-none">
-                      Manu Sanjay
+                      {account?.fullName || "Account"}
                     </span>
                     <span className="text-[10px] text-zinc-400 leading-tight">
-                      PSG Tech · #1
+                      {account?.collegeName || account?.email || "Sign in to your account"}
                     </span>
                   </div>
                 </Button>
@@ -199,13 +249,8 @@ export function Navbar() {
               <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-semibold text-zinc-100">Manu Sanjay</p>
-                    <p className="text-xs text-zinc-400">@manu · manu@psgtech.ac.in</p>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <Badge className="bg-indigo-600/20 text-indigo-300 text-[10px] border-indigo-500/30">
-                        Grandmaster (2420)
-                      </Badge>
-                    </div>
+                    <p className="text-sm font-semibold text-zinc-100">{account?.fullName || "Welcome"}</p>
+                    <p className="text-xs text-zinc-400">{account?.email || "Sign in to save your progress"}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-zinc-800" />
@@ -215,7 +260,7 @@ export function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/profile/manu" className="cursor-pointer">
+                  <Link href={account ? `/profile/${account.id}` : "/login"} className="cursor-pointer">
                     My Profile
                   </Link>
                 </DropdownMenuItem>
@@ -230,11 +275,7 @@ export function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-zinc-800" />
-                <DropdownMenuItem asChild>
-                  <Link href="/login" className="cursor-pointer text-red-400 focus:text-red-300">
-                    Sign out
-                  </Link>
-                </DropdownMenuItem>
+                {account ? <DropdownMenuItem onSelect={(event) => { event.preventDefault(); void signOut(); }} className="cursor-pointer text-red-400 focus:text-red-300">Sign out</DropdownMenuItem> : <DropdownMenuItem asChild><Link href="/login" className="cursor-pointer">Sign in</Link></DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -295,4 +336,5 @@ export function Navbar() {
     </>
   );
 }
+
 

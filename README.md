@@ -67,21 +67,32 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-Fill in your Supabase project credentials (the platform functions seamlessly in demo/dev mode even without external keys):
+Fill in your Supabase project URL and anon key. Authentication requires a configured Supabase project; the app does not simulate login when keys are missing:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable-your-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 EXECUTION_API_URL=http://localhost:9000
 EXECUTION_API_KEY=dev-key
 ```
 
-### 3. Database Migration
+### 3. Configure Supabase Auth
 
-Execute `supabase/schema.sql` and `supabase/seed.sql` in your Supabase SQL editor or local PostgreSQL instance.
+In **Supabase Dashboard → Authentication → URL Configuration**, add these redirect URLs:
 
-### 4. Run Development Server
+```text
+http://localhost:3000/auth/callback
+https://<your-vercel-domain>/auth/callback
+```
+
+Add your production custom domain too, if you use one. For Google sign-in, enable Google under **Authentication → Providers**, then add the Supabase callback URL shown on that provider page to the authorized redirect URIs in Google Cloud. Email/password sign-up sends a confirmation email when email confirmation is enabled. Set the Supabase site URL and email redirect allow list to your local and Vercel domains.
+
+### 4. Database and avatar storage
+
+For a new project, execute `supabase/schema.sql` and `supabase/seed.sql` in the Supabase SQL editor. For an existing project, execute `supabase/auth_profiles_migration.sql` instead. It adds the profile fields, profile creation trigger, row security policies, and the public `avatars` bucket used for uploaded photos.
+
+### 5. Run Development Server
 
 ```bash
 npm run dev
@@ -89,7 +100,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 5. Build for Production
+### 6. Deploy on Vercel
+
+Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY`) to the Vercel project’s Production, Preview, and Development environments. Callback URLs are derived from the current site origin; add each deployed `/auth/callback` URL to Supabase’s redirect allow list. Never expose a Supabase service-role key as a `NEXT_PUBLIC_` variable; the auth and profile flows use the publishable key with row-level security.
+
+### 7. Build for Production
 
 ```bash
 npm run build
@@ -130,3 +145,4 @@ Realistic seed dataset located at: [`supabase/seed.sql`](supabase/seed.sql)
 ## 📜 License
 
 Created for the PSG Educational Community. © 2026 PSGCompile.
+
